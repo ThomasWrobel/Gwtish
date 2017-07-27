@@ -65,8 +65,17 @@ public class FlowPanel extends CellPanel {
 		
 		float newTotalWidthOfCurrentRow = widthOfCurrentRow + incomingWidth + spaceing;    //currentTotalWidgetWidth+incomingWidth+spaceing;
 	
+
+		//was previous widget a NewLinePlacer?		
+		boolean forceNewLine = false;
+		if (index>0){
+			Widget previous = contents.get(index-1);
+			forceNewLine = previous instanceof NewLinePlacer;
+		}
+
+		
 		//if we beat the current maxHeightOfCurrentRow for this row
-		if (incomingHeight>maxHeightOfCurrentRow){
+		if (incomingHeight>maxHeightOfCurrentRow && !forceNewLine){ //dont update height if we are being put on newline. hmz...what if its not forced, but still a newline? would it be wrong
 			maxHeightOfCurrentRow = incomingHeight;
 		}
 		
@@ -74,14 +83,6 @@ public class FlowPanel extends CellPanel {
 		
 		
 		
-		//was previous widget a NewLinePlacer?
-		
-		boolean forceNewLine = false;//widget instanceof NewLinePlacer;
-		if (index>0){
-			Widget previous = contents.get(index-1);
-			 forceNewLine = previous instanceof NewLinePlacer;
-		}
-
 		//if theres no maxwidth, this also becomes the new total width
 		if (maxWidth==-1 && !forceNewLine){
 					
@@ -93,7 +94,7 @@ public class FlowPanel extends CellPanel {
 			
 			//else we work out if we need a new row or not	
 			//NewLinePlacer will force newlines regardless of width
-			if (newTotalWidthOfCurrentRow>=maxWidth || forceNewLine){ //Todo: shouldnt it be the prev element being newline
+			if (newTotalWidthOfCurrentRow>=maxWidth || forceNewLine){ 
 				
 				Log.info("___________________________________Setting new row on flow panel (projected width was:"+newTotalWidthOfCurrentRow+")");
 				
@@ -263,7 +264,7 @@ public class FlowPanel extends CellPanel {
 				Label lab = (Label)widget;
 				String labtext=lab.getText();
 	
-				debug=debug+"[label:"+labtext+"("+zindex+")]";
+				debug=debug+"[label:"+labtext+"]"; //+"("+zindex+")
 			} else {
 	
 				debug=debug+"["+widget.getClass().getName()+"]";

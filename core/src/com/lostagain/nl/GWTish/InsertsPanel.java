@@ -33,9 +33,11 @@ import com.badlogic.gdx.graphics.Color;
 public class InsertsPanel extends FlowPanel {
 	public static Logger Log = Logger.getLogger("Gwtish.InsertsPanel"); 
 	Label currentActiveLabel;
+	private boolean splitnextnl=false;
+	
 	//[[oldlab][randomobject][oldlab][currentlabel...]]
 
-
+	boolean debugMode = true;
 
 	public InsertsPanel() {
 		super();
@@ -61,13 +63,77 @@ public class InsertsPanel extends FlowPanel {
 
 		label.setMaxWidth(super.maxWidth); //ensures never wider then this container. However, inserts may still make textlabels go outside the boundary right now
 
+		if (debugMode){
+		label.getStyle().setBorderColor(Color.WHITE);
+		}
+		
 		return label;
 	}
 
 
 	public void addInnerText(String addThisText){
-		currentActiveLabel.addText(addThisText);
 
+		boolean countbr = currentActiveLabel.isInterpretBRasNewLine();		
+		boolean hasNewlines = containsNewlines(addThisText, countbr);
+				
+		//if we dont have to split, or theres no newlines we can just add the text
+		if (!splitnextnl || !hasNewlines){			
+			Log.info("adding text to existing");
+			currentActiveLabel.addText(addThisText);
+			return;
+		}
+		//
+		//else we need to split and add two labels and a newline between
+		//this takes a lot more work;
+		//.......
+		//...
+		//.
+
+		Log.info("adding text to existing, splitting by newline");
+		int next_nl = addThisText.indexOf("\n");
+		String newlinetype="\n";
+		if (countbr){
+			int lastnlbr = addThisText.indexOf("<br>");
+			if ((lastnlbr<next_nl) && (lastnlbr!=-1)){
+				next_nl=lastnlbr;
+				newlinetype="<br>";
+			}
+		}
+		//------------------------------
+		
+
+		String before = addThisText.substring(0, next_nl);
+		String after = addThisText.substring(next_nl+newlinetype.length());
+
+		if (!before.isEmpty()){ 						//we dont make empty labels
+			Label beforelab = getDefaultLabelType(before);			
+			prepareWidgetToInsertsZIndex(beforelab); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
+			contents.add(beforelab); //inserts it before
+		};
+		
+		NewLinePlacer newline = new NewLinePlacer(debugMode); 
+		prepareWidgetToInsertsZIndex(newline); 
+		contents.add(newline);
+		
+		if (!after.isEmpty()){ 						//we dont make empty labels
+			Label afterlab = getDefaultLabelType(after);			
+			prepareWidgetToInsertsZIndex(afterlab); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
+			contents.add(afterlab); //inserts it before
+			
+		};
+
+		//setup the current active label to point to new end label
+		ensureCurrentActiveLabelSet();
+		
+		//now we recalculate and re-draw to put contents in correct order
+		//(normally done in super.insert or super.add automatically, but as we are manually changing the contents we need to do it ourselves)
+		recalculateLargestWidgets(); 		
+		repositionWidgets(); 
+		sizeToFitContents();
+		//
+		splitnextnl=false;
+		
+		
 	}
 
 	public void setInnerText(String addThisText){
@@ -151,8 +217,9 @@ public class InsertsPanel extends FlowPanel {
 					//b) flag to use it next time if not
 					if (afterlab!=null){
 						splitbynextnewline(afterlab);
+						splitnextnl =false;
 					} else {
-
+						splitnextnl =true;
 					}
 
 					//TODO: we also need to split by whenever the previous newline was, this is too ensure the text is devided squarely
@@ -178,16 +245,9 @@ public class InsertsPanel extends FlowPanel {
 
 
 		Log.info("debug:\n"+getWidgetDebugString());
-		Widget lastwidget = contents.get(contents.size()-1);
 
-		//currentActiveLabel should always be the last label, ensuring there is one first
-		if (lastwidget instanceof Label){			
-			currentActiveLabel=(Label) lastwidget;
-		} else {
-			Label newcurrentlabel = this.getDefaultLabelType("");
-			currentActiveLabel=newcurrentlabel;
-			contents.add(newcurrentlabel);
-		}
+		//setup the current active label to point to new end label
+		ensureCurrentActiveLabelSet();
 
 
 		//now we recalculate and re-draw to put contents in correct order
@@ -203,26 +263,38 @@ public class InsertsPanel extends FlowPanel {
 
 
 
+
+	/**
+	 * repositioning of widgets must be run after this
+	 */
+	private void ensureCurrentActiveLabelSet() {
+		Widget lastwidget = contents.get(contents.size()-1);
+
+		//currentActiveLabel should always be the last label, ensuring there is one first
+		if (lastwidget instanceof Label){			
+			currentActiveLabel=(Label) lastwidget;
+		} else {
+			Label newcurrentlabel = this.getDefaultLabelType("");
+			prepareWidgetToInsertsZIndex(newcurrentlabel); 
+			currentActiveLabel=newcurrentlabel;
+			contents.add(newcurrentlabel);
+		}
+	}
+
+
+
+
 	private void splitbylastnewline(Label lab) {
 		String labtext=lab.getText().toLowerCase();
 
 		boolean countbr = lab.isInterpretBRasNewLine();
-
+		
 		//return if no newlines
-		if (countbr){
-			//if it contains no nlss && no brs
-			if (!labtext.contains("\n") && !labtext.contains("<br>"))
-			{
-				Log.info("no nextnl or br ");
-				return ;
-			}			
-		} else {
-			//if it contains no nlss 
-			if (!labtext.contains("\n") )
-			{
-				Log.info("no nextnl ");
-				return ;
-			}
+		boolean hasNewlines = containsNewlines(labtext, countbr);
+		
+		if (!hasNewlines){
+			Log.info("no nextnl or br ");
+			return;
 		}
 		//-------------
 
@@ -245,6 +317,30 @@ public class InsertsPanel extends FlowPanel {
 
 
 		return ;
+	}
+
+
+
+
+
+	private boolean containsNewlines(String labtext, boolean countbr) {
+		boolean hasNewlines = true;
+		if (countbr){
+			//if it contains no nlss && no brs
+			if (!labtext.contains("\n") && !labtext.contains("<br>"))
+			{
+				Log.info("no nextnl or br ");
+				hasNewlines = false;
+			}			
+		} else {
+			//if it contains no nlss 
+			if (!labtext.contains("\n") )
+			{
+				Log.info("no nextnl ");
+				hasNewlines = false;
+			}
+		}
+		return hasNewlines;
 	}
 
 
@@ -277,7 +373,7 @@ public class InsertsPanel extends FlowPanel {
 		}
 		//-------------
 
-		// loc of last newline
+		// loc of next newline
 		int next_nl = labtext.indexOf("\n");
 		String newlinetype="\n";
 		if (countbr){
@@ -312,7 +408,7 @@ public class InsertsPanel extends FlowPanel {
 
 		Log.info(before+"[nl]"+after);
 
-		NewLinePlacer testnewline = new NewLinePlacer();
+		NewLinePlacer testnewline = new NewLinePlacer(debugMode);
 		//testnewline.setMinSize(15, 15); //to help tests make it visible
 	//	testnewline.getStyle().setBackgroundColor(Color.RED);
 		int index=contents.indexOf(lab)+1; //location of current label to replace
@@ -354,7 +450,7 @@ public class InsertsPanel extends FlowPanel {
 
 		Log.info(before+"[nl]"+after);
 
-		NewLinePlacer testnewline = new NewLinePlacer(); //These are dummywidgets to specify where newlines go in flowpanels
+		NewLinePlacer testnewline = new NewLinePlacer(debugMode); //These are dummywidgets to specify where newlines go in flowpanels
 		int index=contents.indexOf(lab)+1; //location of current label to replace
 
 		if (!after.isEmpty()){ 						//we dont make empty labels
