@@ -427,8 +427,9 @@ public abstract class ComplexPanel extends Widget {
 		return true;
 	}
 
+	
 
-	private void prepareWidgetToInsertsZIndex(Widget widget) {
+	protected void prepareWidgetToInsertsZIndex(Widget widget) {
 		if (this.getStyle().hasZIndex()){
 			
 			int zindex = this.getStyle().getZIndexValue();
