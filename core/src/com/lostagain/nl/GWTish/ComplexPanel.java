@@ -394,17 +394,7 @@ public abstract class ComplexPanel extends Widget {
 		
 	    //if widget has a z-index, the child should be +1 automatically
 		
-		if (this.getStyle().hasZIndex()){
-			
-			int zindex = this.getStyle().getZIndexValue();
-			ZIndexGroup groupname = this.getStyle().getZIndexGroup();
-			//widget.getStyle().setZIndex(zindex+1, groupname);
-			
-			widget.setZIndex(zindex+1, groupname); // we should also deal with child widgets, each one +1 to the parent
-			
-			
-			
-		}
+		prepareWidgetToInsertsZIndex(widget);
 		
 		//------------
 		int atIndex = beforeIndex-1;
@@ -435,6 +425,21 @@ public abstract class ComplexPanel extends Widget {
 		sizeToFitContents();
 		
 		return true;
+	}
+
+
+	private void prepareWidgetToInsertsZIndex(Widget widget) {
+		if (this.getStyle().hasZIndex()){
+			
+			int zindex = this.getStyle().getZIndexValue();
+			ZIndexGroup groupname = this.getStyle().getZIndexGroup();
+			//widget.getStyle().setZIndex(zindex+1, groupname);
+			
+			widget.setZIndex(zindex+1, groupname); // we should also deal with child widgets, each one +1 to the parent
+			
+			
+			
+		}
 	}
 	
 	/**
