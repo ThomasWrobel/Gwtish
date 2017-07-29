@@ -1,5 +1,6 @@
 package com.lostagain.nl.GWTish;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -50,7 +51,7 @@ public class Label extends LabelBase {
 
 	final static String logstag = "ME.Label";
 	public static Logger Log = Logger.getLogger(logstag); //not we are using this rather then gdxs to allow level control per tag
-	
+
 	/**
 	 * The name of the label material
 	 */
@@ -77,20 +78,20 @@ public class Label extends LabelBase {
 	 * we can optionally interpret html like br tags as newlines
 	 */
 	private boolean interpretBRasNewLine=false;
-	
+
 	public boolean isInterpretBRasNewLine() {
 		return interpretBRasNewLine;
 	}
 	/**
 	 * we can optionally interpret html like br tags as newlines
-	 * defaults to false
+	 * defaults to false. Does not refresh text
 	 */
 	public void setInterpretBRasNewLine(boolean interpretBRasNewLine) {
 		this.interpretBRasNewLine = interpretBRasNewLine;
 	}
-	
+
 	private boolean interpretBackslashNasNewLine=true;
-	
+
 	/**
 	 * interpret \n as newlines
 	 * defaults to true	
@@ -237,9 +238,9 @@ public class Label extends LabelBase {
 		}
 		//--------------------------------------------------------
 
-		
+
 		GwtishWidgetShaderAttribute matttest = (GwtishWidgetShaderAttribute) materialAccordingToGetMaterial.get(GwtishWidgetShaderAttribute.ID);
-	
+
 		Log.info( "<---------------------------------------------text :   "+contents); 
 		Log.info( "matt test for label has Text:"+matttest.hasText()); 
 		Log.info( "text col:   "+matttest.textColour); 
@@ -247,12 +248,12 @@ public class Label extends LabelBase {
 		if (sizeMode==SizeMode.Fixed){
 			//calc needed shader scaleing. Fixed size mode enlarges and shrinks texture to fit model - but does so in the shader, not by changing the underlying texture resolution
 			//(which is pointless - as you could only ever lose information and make it look worse.)
-			
+
 			calculateCorrectShaderTextScale(1.0f); //default to a 1.0f, which means we use the native bitmap font size 
 
-		//old;
-		//if fixed mode we might need to pad the texture to ensure it keeps its ratio			
-		//setPaddingToPreserveTextRatio(TextAlign.LEFT,  maxWidth , maxHeight, this.textureSize.x, this.textureSize.y);
+			//old;
+			//if fixed mode we might need to pad the texture to ensure it keeps its ratio			
+			//setPaddingToPreserveTextRatio(TextAlign.LEFT,  maxWidth , maxHeight, this.textureSize.x, this.textureSize.y);
 
 		}
 
@@ -313,37 +314,37 @@ public class Label extends LabelBase {
 			MODELALIGNMENT alignment, 
 			TextAlign textAlignment,
 			Style style) {
-		
-		
+
+
 		TextureAndCursorObject textureData = null;
 
-		
+
 		BitmapFont font;     //     = getEffectiveFont(style);
 		float NativeToSceneRatio;// = getNativeToSceneResizeRatio(style, font);
-		
+
 		if (contents.isEmpty()){
 			//if no contents we dont bother getting the font
 			//(this allows the creation of empty labels before the font is ready)
 			font=null;
 			NativeToSceneRatio=1.0f; //randomvalue, no real effect with empty texture
 		} else {
-		
+
 			font          = getEffectiveFont(style);
 			NativeToSceneRatio = getNativeToSceneResizeRatio(style, font);
-		
+
 		}
-		
+
 		int startFromX =0;
 		int startFromY =0;
 		Pixmap addToThis = null;
-		
-		
+
+
 		if (regenTexture){			
-			
+
 			textureData = generateTexture(labelsSizeMode, contents,interpretBRasNewLine,interpretNLasNewLine,
 					NativeToSceneRatio,maxWidth,textAlignment,style,font,
 					startFromX,startFromY,addToThis); //left default	
-			
+
 		}
 
 		Texture newTexture = textureData.textureItself;
@@ -365,7 +366,7 @@ public class Label extends LabelBase {
 		//we normally get the model size from the generated material unless its specified as fixed
 		float textureSizeX = newTexture.getWidth();
 		float textureSizeY = newTexture.getHeight();
-		
+
 		float SizeX = textureSizeX * (1.0f/NativeToSceneRatio);
 		float SizeY = textureSizeY * (1.0f/NativeToSceneRatio);
 
@@ -375,7 +376,7 @@ public class Label extends LabelBase {
 			SizeY = maxHeight;
 
 			textStyle.setTextScaleing(TextScalingMode.fitPreserveRatio); 
-			
+
 			Log.info( "fitarea detected texture size mode set as:"+textStyle.textScaleingMode); 
 			//setPaddingToPreserveTextRatio(TextAlign.LEFT,  maxWidth , maxHeight, sizeX, sizeY);
 
@@ -383,7 +384,7 @@ public class Label extends LabelBase {
 
 		//TODO:also ensure its bigger then the minimum size?
 		//
-		
+
 
 		Material mat = 	
 				new Material(LABEL_MATERIAL,
@@ -391,9 +392,9 @@ public class Label extends LabelBase {
 						//TextureAttribute.createDiffuse(newTexture),
 						//	ColorAttribute.createDiffuse(defaultBackColour), //needs to be passed into this function
 						textStyle);
-		
 
-		
+
+
 		Model newModel = Widget.generateBackground(SizeX, SizeY, mat, alignment);
 
 		//GwtishWidgetShaderAttribute matttest2 = (GwtishWidgetShaderAttribute) newModel.getMaterial(LABEL_MATERIAL).get(GwtishWidgetShaderAttribute.ID);
@@ -407,31 +408,32 @@ public class Label extends LabelBase {
 				textureData.Cursor.x,
 				textureData.Cursor.y,
 				new Vector2(textureSizeX,textureSizeY),
-				textureData.rawPixelData
+				textureData.rawPixelData,
+				textureData.newline_indexs
 				);
 
 
 		GwtishWidgetShaderAttribute testAttribute = (GwtishWidgetShaderAttribute)setupData.object.getMaterial(LABEL_MATERIAL).get(GwtishWidgetShaderAttribute.ID);
-		
+
 		Log.info( "<---------------------------------------------setupData :   "+testAttribute.hasText()); 
-		
-		
-		
+
+
+
 		return setupData;
 
 
 	}
-	
+
 	private static BitmapFont getEffectiveFont(Style style) {
-				
+
 		BitmapFont rawFont = Style.getDefaultFont(); // FontHandling.standdardFont;
 		BitmapFont adjustedFont = rawFont;
-		
+
 		if (style!=null){
 
 
 			rawFont = style.getFont(); // FontHandling.standdardFont;
-			
+
 			//make a copy of the font so we can customize the line height data
 			//probably not very efficient?
 			adjustedFont = new BitmapFont(
@@ -449,34 +451,34 @@ public class Label extends LabelBase {
 			if (LineHeightUnit == Style.Unit.UNITLESS){				
 				//only supported if font size is pixels
 				if (style.getFontSizeUnit() == Unit.PX){
-					
-					
+
+
 					//double fontsize = style.getFontSize(); //wait, we  dont want real size as the texture map is generated at native resolution regardless of what the display size will be.
 					double fontsize = FontHandling.getNativeFontSize(rawFont) ;//rawFont.getLineHeight();
 					double effectiveSize = fontsize*LineHeight;
 
 					Log.info( "native fontsize:   "+fontsize+"   LineHeight:"+LineHeight); 
-					
+
 					Log.info( "effective lineheight:   "+effectiveSize); 
 					adjustedFont.getData().setLineHeight((float) effectiveSize);
-					
+
 				}
 			}
-			
+
 		}
 		return adjustedFont;
 	}
 
-/**
- * 
- * @param text
- * @param NativeSceneRatio
- * @param effectiveMaxWidth
- * @param align
- * @param stylesettings
- * @param font
- * @return
- */
+	/**
+	 * 
+	 * @param text
+	 * @param NativeSceneRatio
+	 * @param effectiveMaxWidth
+	 * @param align
+	 * @param stylesettings
+	 * @param font
+	 * @return
+	 */
 	static public TextureAndCursorObject generatePixmapForShader(
 			String text, 
 			boolean interpretBRasNewLine,
@@ -497,7 +499,7 @@ public class Label extends LabelBase {
 		TextureAndCursorObject textureDAta = generateTexture_fromLayout(layout, font,startFromX,startFromY,addToThis); 
 
 		//Font size  trying to figure out
-		
+
 		//Note; in order to scale text to fit in other modes we still render at the native size, but dont effect the mesh size
 		//the texture will then auto-scale into the space. 
 		//
@@ -508,10 +510,10 @@ public class Label extends LabelBase {
 		//ii) or maybe we change the width proportionally the other way? (then when its sized up to the widget size it will be correct? err...seems weird but should work? )
 		//
 		//font size is stored in style right now, so whatever we do we use that 
-		
-		
-		
-		
+
+
+
+
 		//old;
 
 
@@ -546,87 +548,86 @@ public class Label extends LabelBase {
 		return textureDAta;
 
 	}
-private static GlyphLayout getNewLayout(String text, 
-		boolean interpretBRasNewLine, boolean interpretNLasNewLine,
-		float NativeSceneRatio,
-		float effectiveMaxWidth, TextAlign align, BitmapFont font) {
-	GlyphLayout layout = new GlyphLayout();	    
-	//layout.setText(DefaultStyles.standdardFont, text);
+	private static GlyphLayout getNewLayout(String text, 
+			boolean interpretBRasNewLine, boolean interpretNLasNewLine,
+			float NativeSceneRatio,
+			float effectiveMaxWidth, TextAlign align, BitmapFont font) {
+		GlyphLayout layout = new GlyphLayout();	    
+		//layout.setText(DefaultStyles.standdardFont, text);
 
 
-	
-	
-	//if maxWidth is zero or -1 then we dynamically work it out instead
-	//this means the texture will just be as horizontally long as it needs too, without forced wrapping
-	if (effectiveMaxWidth<1){
-		layout.setText(font, text); 
-		effectiveMaxWidth = layout.width; //gets width at native font size
-	}	else {
-		
-		//if the effectiveMaxWidth is set however,we might have to shrink it by the NativeSceneRatio
-		//This is because font size effects when wraps have to happen.
-		//Bigger font = bigger letters = must wrap sooner
-		//
-		//so this "fake shrunk" newwidth is used to determine the wrapping of the font, which is then scaled up again at the end.
-		//Note; the actual per-character pixel size of the map never changes, we are just using this to cropit different
-		
-		effectiveMaxWidth = effectiveMaxWidth * NativeSceneRatio;
-		
-		
+
+		//if maxWidth is zero or -1 then we dynamically work it out instead
+		//this means the texture will just be as horizontally long as it needs too, without forced wrapping
+		if (effectiveMaxWidth<1){
+			layout.setText(font, text); 
+			effectiveMaxWidth = layout.width; //gets width at native font size
+		}	else {
+
+			//if the effectiveMaxWidth is set however,we might have to shrink it by the NativeSceneRatio
+			//This is because font size effects when wraps have to happen.
+			//Bigger font = bigger letters = must wrap sooner
+			//
+			//so this "fake shrunk" newwidth is used to determine the wrapping of the font, which is then scaled up again at the end.
+			//Note; the actual per-character pixel size of the map never changes, we are just using this to cropit different
+
+			effectiveMaxWidth = effectiveMaxWidth * NativeSceneRatio;
+
+
+		}
+
+
+
+		Log.info(text+"___layout width:"+effectiveMaxWidth);
+		Log.info(text+"___layout line height:"+font.getLineHeight());
+
+		//convert from text align to layout align
+		int layoutAlignment = Align.center;
+
+		switch (align) {
+		case CENTER:
+			layoutAlignment = Align.center;
+			break;
+		case JUSTIFY:		    
+			Log.info("___JUSTIFY NOT SUPPORTED. DEFAULTING TO CENTER");
+			layoutAlignment = Align.center;
+			break;
+		case LEFT:
+			layoutAlignment = Align.left;
+			break;
+		case RIGHT:
+			layoutAlignment = Align.right;
+			break;
+		default:
+			layoutAlignment = Align.center;
+			break;
+		}
+
+		if (!interpretNLasNewLine){
+			text=text.replace("\n", "");	
+		}
+		//if we are set to interpret <br> as newline, then we replace them with \n
+		if (interpretBRasNewLine){	
+			text=text.replace("<br>", "\n");					
+		}
+
+
+		layout.setText(font, text, Color.BLACK, effectiveMaxWidth, layoutAlignment, true); //can't centralize without width
+		return layout;
 	}
-	
-			
 
-	Log.info(text+"___layout width:"+effectiveMaxWidth);
-	Log.info(text+"___layout line height:"+font.getLineHeight());
-
-	//convert from text align to layout align
-	int layoutAlignment = Align.center;
-
-	switch (align) {
-	case CENTER:
-		layoutAlignment = Align.center;
-		break;
-	case JUSTIFY:		    
-		Log.info("___JUSTIFY NOT SUPPORTED. DEFAULTING TO CENTER");
-		layoutAlignment = Align.center;
-		break;
-	case LEFT:
-		layoutAlignment = Align.left;
-		break;
-	case RIGHT:
-		layoutAlignment = Align.right;
-		break;
-	default:
-		layoutAlignment = Align.center;
-		break;
-	}
-	
-	if (!interpretNLasNewLine){
-		text=text.replace("\n", "");	
-	}
-	//if we are set to interpret <br> as newline, then we replace them with \n
-	if (interpretBRasNewLine){	
-		text=text.replace("<br>", "\n");					
-	}
-
-
-	layout.setText(font, text, Color.BLACK, effectiveMaxWidth, layoutAlignment, true); //can't centralize without width
-	return layout;
-}
-	
 
 	//note implemented yet
 	//private static Vector2 caclculateModelSizeFromTexture(float getNativeToSceneResizeRatio, Style stylesettings) {
-		
-		//textureSize.x, textureSize.y
-		
+
+	//textureSize.x, textureSize.y
+
 	//	Vector2 test = new Vector2(0,0);
-		
+
 	//	return test;
-		
+
 	//}
-	
+
 	/**
 	 * The ratio between the internal pixmap font size and the one requested in the style as the output size.
 	 * The actual widget size should thus be;
@@ -639,35 +640,35 @@ private static GlyphLayout getNewLayout(String text,
 	 */
 	private static float getNativeToSceneResizeRatio(Style stylesettings, BitmapFont font) {
 		float ShrinkWidthRatio = 1.0f;
-		
+
 		//if font size is set we work out the changes here
 		if (stylesettings!=null && stylesettings.fontSizeUnit!=Unit.NOTSET){
-		
-		///font.getData().setScale(3.5f); //scaling only effects spacing, not font size
-		//how to do font size ?
-		//maybe work out the difference between native and result width/height as ratio?
-		//scale down the width so it wraps at the correct letters, then..umm...set the shader font scale up? to....err.something?		
-		
-		//lets try getting te ratio of the native map height to the result height;
-		float baseToAssent = font.getCapHeight()+font.getAscent();
-		Log.info("__native cap+ascent:"+baseToAssent);	
-		float baseToDecent = -font.getDescent();
-		Log.info("__native baseToDecent:"+baseToDecent);	
-		
-		float fontHeight = baseToAssent+baseToDecent; //seems too small?
-		fontHeight=32; //actual size		
-		Log.info("__native fontHeight:"+fontHeight);
-		
-		double fontSizeRequested = stylesettings.getFontSize();
-		Log.info("__requested fontHeight:"+fontSizeRequested+" ("+stylesettings.getFontSizeUnit()+")");
-		double ratio = fontHeight/fontSizeRequested;
-		ShrinkWidthRatio = (float) ratio;
-		
-		Log.info("__ratio:"+ShrinkWidthRatio); //shrink width by this amount (if fixed width)
-		
-		//now sale up again using the ratio in the shader? or just geometry
-		
-		//-------------------------
+
+			///font.getData().setScale(3.5f); //scaling only effects spacing, not font size
+			//how to do font size ?
+			//maybe work out the difference between native and result width/height as ratio?
+			//scale down the width so it wraps at the correct letters, then..umm...set the shader font scale up? to....err.something?		
+
+			//lets try getting te ratio of the native map height to the result height;
+			float baseToAssent = font.getCapHeight()+font.getAscent();
+			Log.info("__native cap+ascent:"+baseToAssent);	
+			float baseToDecent = -font.getDescent();
+			Log.info("__native baseToDecent:"+baseToDecent);	
+
+			float fontHeight = baseToAssent+baseToDecent; //seems too small?
+			fontHeight=32; //actual size		
+			Log.info("__native fontHeight:"+fontHeight);
+
+			double fontSizeRequested = stylesettings.getFontSize();
+			Log.info("__requested fontHeight:"+fontSizeRequested+" ("+stylesettings.getFontSizeUnit()+")");
+			double ratio = fontHeight/fontSizeRequested;
+			ShrinkWidthRatio = (float) ratio;
+
+			Log.info("__ratio:"+ShrinkWidthRatio); //shrink width by this amount (if fixed width)
+
+			//now sale up again using the ratio in the shader? or just geometry
+
+			//-------------------------
 		} else {
 			ShrinkWidthRatio = 1f; //default no change
 		}
@@ -689,18 +690,18 @@ private static GlyphLayout getNewLayout(String text,
 		int currentWidth  = (int) layout.width;
 		int currentHeight = (int) (layout.height+standdardFont.getCapHeight()); //not sure if cap  height is correct
 		//.info("_________standdardFont.getCapHeight()="+standdardFont.getCapHeight()+" ");
-		
+
 		Pixmap textPixmap;
-		
-		 //new pixmap with old data
-		 if (addToThis!=null){
-			 
+
+		//new pixmap with old data
+		if (addToThis!=null){
+
 			int newRequiredWidth  = startFromX+currentWidth;			 
 			int newRequiredHeight = startFromY+currentHeight;
-			
+
 			//if new width or height is bigger we need to make a new map
 			if (newRequiredWidth>addToThis.getWidth() || newRequiredHeight>addToThis.getHeight()){
-				
+
 				//should pick the biggest values for both dimensions
 				if (newRequiredWidth<addToThis.getWidth()){
 					newRequiredWidth=addToThis.getWidth();
@@ -710,52 +711,62 @@ private static GlyphLayout getNewLayout(String text,
 				}
 
 				Log.info("_________creating new pixmap of size:"+newRequiredWidth+","+newRequiredHeight+" ");
-				
+
 				textPixmap = new Pixmap(newRequiredWidth, newRequiredHeight, Format.RGBA8888);
 				textPixmap.drawPixmap(addToThis, 0, 0);
-				
+
 				//dispose old
 				addToThis.dispose();
-				
+
 			} else {
 				//reuse old map!
 				textPixmap=addToThis;
 			}
-			
-			 
-		 } else {
+
+
+		} else {
 			//new pixmap with no data
-			 textPixmap = new Pixmap(currentWidth, currentHeight, Format.RGBA8888);
-			 
-		 }
-			 
-		 
-		 
+			textPixmap = new Pixmap(currentWidth, currentHeight, Format.RGBA8888);
+
+		}
+
+
+
 		Pixmap fontPixmap = getFontPixmap(standdardFont);
 
 		int currentTargetX = 0;
 		int currentTargetY = 0;
 
 		float advance = 0;
+		
+		int current_index = 0; //used only to keep track of newlines
+		ArrayList<Integer> newline_indexs = new ArrayList<Integer>();
+		
 		//now loop over each run of letters. 
 		for (GlyphRun grun : layout.runs) {
 
 			String runstring = "";
 			float currentRunX= 0; 
-			 advance = 0;
+			advance = 0;
+
+			//store as newline location
+			if (current_index>0){
+				newline_indexs.add(current_index);
+			}
 			
 			//now draw each letter
-		//	Log.info("_________grun="+grun.x+","+grun.y+" ");
+			//	Log.info("_________grun="+grun.x+","+grun.y+" ");
 			int i =0;
 			for (Glyph glyph : grun.glyphs) {
-
+				current_index++;
+				
 				advance = grun.xAdvances.get(i);
 				i++;
 				currentRunX=currentRunX   +   advance    ; //1 should not be needed
 
-				 currentTargetX = startFromX+ (int)grun.x  + (int)currentRunX;		//used to use startfrom to add to the pixmap, now we add to the texture instead		
-				 currentTargetY = startFromY+ (int)grun.y;
-				
+				currentTargetX = startFromX+ (int)grun.x  + (int)currentRunX;		//used to use startfrom to add to the pixmap, now we add to the texture instead		
+				currentTargetY = startFromY+ (int)grun.y;
+
 				textPixmap.drawPixmap(
 						fontPixmap,
 						glyph.srcX,
@@ -769,7 +780,7 @@ private static GlyphLayout getNewLayout(String text,
 
 				// 	Log.info("___ "+glyph.toString()+" glyph.xadvance:"+glyph.xadvance+" w:"+glyph.width);	
 				//	Log.info("___g:"+g.toString());
-				
+
 				runstring=runstring+glyph.toString();
 
 			}
@@ -784,76 +795,78 @@ private static GlyphLayout getNewLayout(String text,
 
 
 		}
-		
+
 		//work out final cursor position, which is currentTargetX + last advance
 		int cx = (int) (currentTargetX+advance);
 		int cy = (int) (currentTargetY); 
-		
+
 		//PixmapAndCursorObject pixmapAndCursor = new PixmapAndCursorObject(textPixmap, cx, cy);
 
 		Texture textureData; 
-	//	if (startFromX==0 && startFromY==0 || addToThis==null){
-			textureData = new Texture(textPixmap);
-			/*
+		//	if (startFromX==0 && startFromY==0 || addToThis==null){
+		textureData = new Texture(textPixmap);
+		/*
 		} else {
 			//add pixmap to existing texture
 			//textureData = new Texture(pixmapAndCursor.textureItself);
-			
+
 			//enlarge?
 			//
 			Log.info("______________textPixmap size: "+textPixmap.getWidth()+","+textPixmap.getHeight());	
 			Log.info("______________adding at: "+startFromX+","+startFromY);	
 			Log.info("______________texture size: "+addToThis.getWidth()+","+addToThis.getHeight());	
-			
+
 		//	textPixmap.fill();			
-			
+
 			//addToThis.getTextureData().prepare();
 		//	Pixmap existingTexture = addToThis.getTextureData().consumePixmap();
-		
-			
+
+
 			addToThis.draw(textPixmap, startFromX, startFromY); //todo: startFromY is wrong?? seems to draw offscreen if set
 
 			//note; drawing doesnt work if ANY of it is outside the bounds
-			
+
 			//add the startfroms to the cursor pos
 			cx=startFromX+cx;
 			cy=startFromY+cy;
-			
+
 			textureData=addToThis;
 		}*/
 		
-		
+		newline_indexs.add(current_index);
+
 		TextureAndCursorObject textureAndCursorObject = new TextureAndCursorObject(
 				textureData,
 				cx,
 				cy,
-				textPixmap);
-		
+				textPixmap,
+				newline_indexs);
+
 		//textPixmap.dispose();
-		
+
 		return textureAndCursorObject;
 
 
 	}
-	
-	
+
+
 	static HashMap<BitmapFont,Pixmap> fontCache = new HashMap<BitmapFont,Pixmap>();
-	
+
 	/**
 	 * Gets a pixmap of the specified font, using a cache if its already been created before
 	 * @param standdardFont
 	 * @return
 	 */
 	private static Pixmap getFontPixmap(BitmapFont standdardFont) {
-		
+
 		Pixmap	fontPixmap = fontCache.get(standdardFont);
-		
+
 		if (fontPixmap==null){		
 			BitmapFontData data = standdardFont.getData(); 
 			fontPixmap = new Pixmap(Gdx.files.internal(data.imagePaths[0])); 
 			fontCache.put(standdardFont, fontPixmap);
 		}
-		
+
 		return fontPixmap;
 	}
 
@@ -874,11 +887,12 @@ private static GlyphLayout getNewLayout(String text,
 		TextureAndCursorObject textureAndCursorObject = new TextureAndCursorObject(
 				new Texture(data.textureItself),
 				data.Cursor.x,data.Cursor.y,
-				data.textureItself
+				data.textureItself,
+				null
 				);
-	//	data.textureItself.dispose();
-		
-		
+		//	data.textureItself.dispose();
+
+
 		return textureAndCursorObject;
 	}
 
@@ -1067,7 +1081,7 @@ private static GlyphLayout getNewLayout(String text,
 		this.contents=text;
 
 		//todo; check if we can add instead?
-		
+
 		regenerateTexture(text,null);
 
 	}
@@ -1082,78 +1096,78 @@ private static GlyphLayout getNewLayout(String text,
 		if (text.isEmpty()){
 			return; // no op
 		}
-		
+
 		this.contents=contents+text;
 
 		Log.info("adding: "+text+" to existing text");
-		
+
 		boolean textWraps=false;
-		
-	//	if (labelsSizeMode==SizeMode.Fixed || labelsSizeMode==SizeMode.ExpandXYToFit){ //these things never wrap
+
+		//	if (labelsSizeMode==SizeMode.Fixed || labelsSizeMode==SizeMode.ExpandXYToFit){ //these things never wrap
 
 		//	Log.info("(label doesnt wrap) ");
-	//		textWraps=false;
-	//	} else {
-			//we might still wrap, but we need to work it out based on if we have a new height
+		//		textWraps=false;
+		//	} else {
+		//we might still wrap, but we need to work it out based on if we have a new height
 
-			//get new predicted size based on existing settings
-			float effectiveMaxWidth = maxWidth;
-			if (maxWidth!=-1){
-				effectiveMaxWidth = maxWidth - (this.getStyle().getPaddingLeft() + this.getStyle().getPaddingRight());
-			}
-			BitmapFont font          = getEffectiveFont(this.getStyle());
-			float NativeToSceneRatio = getNativeToSceneResizeRatio(this.getStyle(), font);
-			
-			GlyphLayout layout = getNewLayout(contents, interpretBRasNewLine,interpretBackslashNasNewLine, NativeToSceneRatio, effectiveMaxWidth, this.lastUsedTextAlignment, font);
-			
-			int newheight = (int) (layout.height +font.getCapHeight());
-			int newwidth = (int) layout.width;
-			
-			Log.info(" new height = "+newheight);
-			Log.info(" current text height = "+textureSize.y);
+		//get new predicted size based on existing settings
+		float effectiveMaxWidth = maxWidth;
+		if (maxWidth!=-1){
+			effectiveMaxWidth = maxWidth - (this.getStyle().getPaddingLeft() + this.getStyle().getPaddingRight());
+		}
+		BitmapFont font          = getEffectiveFont(this.getStyle());
+		float NativeToSceneRatio = getNativeToSceneResizeRatio(this.getStyle(), font);
 
-			//notes;
-			//cursor y seems to slowly get displaced (ie, a few pixels too big each time)
-			//also x might be too small
-			if (newheight>textureSize.y){
-				Log.info(" size changed, so we need to regenerate ");
-				textWraps=true;
-			} else {
-				textWraps=false;
-			}
-			
-	//	}
-		
+		GlyphLayout layout = getNewLayout(contents, interpretBRasNewLine,interpretBackslashNasNewLine, NativeToSceneRatio, effectiveMaxWidth, this.lastUsedTextAlignment, font);
+
+		int newheight = (int) (layout.height +font.getCapHeight());
+		int newwidth = (int) layout.width;
+
+		Log.info(" new height = "+newheight);
+		Log.info(" current text height = "+textureSize.y);
+
+		//notes;
+		//cursor y seems to slowly get displaced (ie, a few pixels too big each time)
+		//also x might be too small
+		if (newheight>textureSize.y){
+			Log.info(" size changed, so we need to regenerate ");
+			textWraps=true;
+		} else {
+			textWraps=false;
+		}
+
+		//	}
+
 		if (textWraps){
 
 			//get rid of old texture
 			//((TextureAttribute)infoBoxsMaterial.get(TextureAttribute.Diffuse)).textureDescription.texture.dispose();
-			
-			
+
+
 			Log.info(" regenerating texture ");
 			regenerateTexture(contents,null);
-			
+
 		} else {
 			Log.info(" adding to texture ");
 
-		//	Texture addToExisting = new Texture(newwidth, newheight, Format.RGBA8888);
-		//	addToExisting.draw(super.currentPixmap, 0, 0);
-			
-			
+			//	Texture addToExisting = new Texture(newwidth, newheight, Format.RGBA8888);
+			//	addToExisting.draw(super.currentPixmap, 0, 0);
+
+
 			regenerateTexture(text,super.currentPixmap);
 		}
-		
-		
-		
+
+
+
 	}
 
 
-	
+
 	/**
 	 * 
 	 */
 	private void regenerateTexture(String text,Pixmap addToExisting) {
-		
+
 		TextAlign align = this.getStyle().getTextAlignment();
 		lastUsedTextAlignment = align;
 
@@ -1162,7 +1176,7 @@ private static GlyphLayout getNewLayout(String text,
 		if (maxWidth!=-1){
 			effectiveMaxWidth = maxWidth - (this.getStyle().getPaddingLeft() + this.getStyle().getPaddingRight());
 		}
-		
+
 
 		BitmapFont font = getEffectiveFont(this.getStyle());
 		float NativeToSceneRatio = getNativeToSceneResizeRatio(this.getStyle(), font);
@@ -1171,14 +1185,14 @@ private static GlyphLayout getNewLayout(String text,
 
 		int startFromX =0;
 		int startFromY =0;
-		
+
 		if (addToExisting!=null){
 			startFromX =(int) super.Cursor.x;
 			startFromY =(int) super.Cursor.y;
 			Log.info("Cursor is currently at: "+startFromX+","+startFromY);
 		}
 
-		
+
 		TextureAndCursorObject textureAndData = generateTexture(
 				labelsSizeMode, 
 				text, //contents
@@ -1196,24 +1210,24 @@ private static GlyphLayout getNewLayout(String text,
 		Material ourMaterial = getTextMaterial();// this.getMaterial(LABEL_MATERIAL);	
 
 		Texture newTexture = textureAndData.textureItself;
-		
+
 		//dispose of previous texture 
 		//((TextureAttribute)infoBoxsMaterial.get(TextureAttribute.Diffuse)).textureDescription.texture.dispose();
 		//
 
 		//infoBoxsMaterial.set(TextureAttribute.createDiffuse(newTexture));
-	
-		
+
+
 		GwtishWidgetShaderAttribute textStyleData = (GwtishWidgetShaderAttribute)ourMaterial.get(GwtishWidgetShaderAttribute.ID);
 
 		//dispose of previous texture if there was one
 		if (textStyleData!=null && textStyleData.distanceFieldTextureMap!=null){
 			textStyleData.distanceFieldTextureMap.dispose();
 		}
-		
+
 		textStyleData.distanceFieldTextureMap = newTexture;
 		//
-		
+
 
 		//if (textStyle==null){
 		//textStyle = new DistanceFieldShader.DistanceFieldAttribute(DistanceFieldAttribute.presetTextStyle.whiteWithShadow);
@@ -1225,27 +1239,27 @@ private static GlyphLayout getNewLayout(String text,
 
 		float textureSizeX = textureAndData.textureItself.getWidth();
 		float textureSizeY = textureAndData.textureItself.getHeight();
-		
+
 		if (textureSizeX>10000){
 			Log.severe("Texture SizeX Over 10,000! Consider spliting label");
 		}
 		if (textureSizeY>10000){
 			Log.severe("Texture SizeY Over 10,000! Consider spliting label");
 		}
-		
+
 		//update stats on our texture size
-		super.updateData(new Vector2(textureSizeX,textureSizeY), textureAndData.Cursor,textureAndData.rawPixelData); //TODO: cursor position should always be set to the next position to type. Not sure textureAndData returns this yet
+		super.updateData(new Vector2(textureSizeX,textureSizeY), textureAndData.Cursor,textureAndData.rawPixelData,textureAndData.newline_indexs); //TODO: cursor position should always be set to the next position to type. Not sure textureAndData returns this yet
 		//---------------------
-		
-		
+
+
 		//new widget size (without padding, as the  setSizeAs adds it itself)
 		float x = textureSizeX * (1.0f/NativeToSceneRatio);
 		float y = textureSizeY * (1.0f/NativeToSceneRatio);
-		
+
 
 		Log.info("_________setting text to;"+text+" texturesize:"+textureSizeX+","+textureSizeY);
 		Log.info("_________NativeToSceneRatio;"+(1.0f/NativeToSceneRatio));
-		
+
 		//boolean autoPadToPreserveRatio = true;
 		Log.info("_________setting text to;"+text+" size:"+x+","+y);
 
@@ -1260,15 +1274,15 @@ private static GlyphLayout getNewLayout(String text,
 			Log.info("_________(fixed mode, so size doesnt change)");
 			//real size should only set if not on fixed size mode. However, we do want to effect the padding as the real widget ratio might not match the text texture, so we need to pad the widget to compensate
 			//setPaddingToPreserveTextRatio(align, maxWidth, maxHeight, x, y);
-			
+
 			break;
 		}
-		
-		
+
+
 		//ensure the text scale in the shader is correct
 		//this effectively "fills" the mesh with the text and a surrounding border of padding
 		calculateCorrectShaderTextScale(NativeToSceneRatio); 
-		
+
 	}
 
 	/*
@@ -1397,7 +1411,7 @@ private static GlyphLayout getNewLayout(String text,
 
 
 		TextureAndCursorObject NewTexture = null;
-		
+
 		//if empty we use a quick function
 		if (contents.isEmpty()){
 			NewTexture  = generateEmptyTexture();
@@ -1436,24 +1450,24 @@ private static GlyphLayout getNewLayout(String text,
 
 		Pixmap textPixmap = new Pixmap(1, 1, Format.RGBA8888);
 		Texture textureData = new Texture(textPixmap);
-			
-		
+
+
 		TextureAndCursorObject textureAndCursorObject = new TextureAndCursorObject(
 				textureData,
 				0,
 				0,
-				textPixmap);
-		
+				textPixmap,null);
+
 		return textureAndCursorObject;
 	}
-	
-	
-	
+
+
+
 	static public void firstTimeSetUp(){
 		//setup font size cache		
 		FontHandling.cacheFontSizes();
-		
-		
+
+
 	}
 
 
@@ -1596,27 +1610,27 @@ Text size remains just h/w, however
 		if (labelsSizeMode==SizeMode.Fixed){			
 			//fixed works differently, as its based on widget size, not font size			
 			//the smaller ratio  - either the width or height
-			 float effectiveMaxWidth = this.maxWidth - (this.getStyle().getPaddingLeft()+this.getStyle().getPaddingRight());			 
+			float effectiveMaxWidth = this.maxWidth - (this.getStyle().getPaddingLeft()+this.getStyle().getPaddingRight());			 
 			float effectiveMaxHeight = this.maxHeight- (this.getStyle().getPaddingBottom()+this.getStyle().getPaddingTop());
-			
+
 			textScale = Math.min(
-										effectiveMaxWidth / (textureSize.x),
-					                    effectiveMaxHeight / (textureSize.y)
-					              ); 		
-					
+					effectiveMaxWidth / (textureSize.x),
+					effectiveMaxHeight / (textureSize.y)
+					); 		
+
 		} else {			
-			 textScale =  (1.0f/nativeToSceneRatio);			
+			textScale =  (1.0f/nativeToSceneRatio);			
 		}
 
 		this.getStyle().setTextScale(textScale);
 		/*
-		
+
 		float widgetWidth  = this.getWidth(); //returns size with padding
 		float widgetHeight = this.getHeight();
 
 		Log.info("_________setting shader to textScale based on real size ;"+widgetWidth+","+widgetHeight);
 		Log.info("_________setting shader to textScale based on texture size ;"+textureSize.x+","+textureSize.y);
-		
+
 		float totalPaddingWidth =  (getStyle().getPaddingLeft()+getStyle().getPaddingRight());
 		if (totalPaddingWidth>widgetWidth){
 			totalPaddingWidth=widgetWidth;
@@ -1625,24 +1639,24 @@ Text size remains just h/w, however
 		if (totalPaddingHeight>widgetHeight){
 			totalPaddingHeight=widgetHeight;
 		}
-		
+
 		//now get the widget size without padding
 		float widgetWidthWithoutPadding  = widgetWidth-totalPaddingWidth;		
 		float widgetHeightWithoutPadding = widgetHeight-totalPaddingHeight;
 		//---
-		
+
 		//the smaller ratio  - either the width or height
 		float textScale = Math.min(
 									widgetWidthWithoutPadding / (textureSize.x),
 				                    widgetHeightWithoutPadding/ (textureSize.y)
 				                   ); 
-	
+
 		Log.info("_________setting shader to textScale;"+textScale);
 
 		this.getStyle().setTextScale(textScale);*/
-		
+
 	}
-	
+
 
 
 	/**
@@ -1657,12 +1671,96 @@ Text size remains just h/w, however
 		//dispose of previous texture 
 		textStyleData.distanceFieldTextureMap.dispose();
 
-	//	((TextureAttribute)material.get(TextureAttribute.Diffuse)).textureDescription.texture.dispose();
+		//	((TextureAttribute)material.get(TextureAttribute.Diffuse)).textureDescription.texture.dispose();
+
+	}
+
+
+	/**
+	 *  br or nl
+	 */
+	boolean containsNewlines() {
+
+		String labtext = this.getText();
+		boolean countbr = this.isInterpretBRasNewLine();
+
+		return containsNewlines(labtext,countbr);
+
+	}
+
+	static boolean containsNewlines(String labtext,boolean countbr) {
+
+		boolean hasNewlines = true;
+
+		if (countbr){
+			//if it contains no nlss && no brs
+			if (!labtext.contains("\n") && !labtext.contains("<br>"))
+			{
+				Log.info("no nextnl or br ");
+				hasNewlines = false;
+			}			
+		} else {
+			//if it contains no nlss 
+			if (!labtext.contains("\n") )
+			{
+				Log.info("no nextnl ");
+				hasNewlines = false;
+			}
+		}
+		return hasNewlines;
+	}
+
+	/**
+	 * Returns the index of the last newline.<br>
+	 * Or , to be exact, the last bundles distance relative to the END of the string.<br>
+	 * <br>
+	 * <br>
+	 * A newline can be originally caused  by a \n , a {@literal<br>} , or auto-wrapping<br>
+	 * <br>
+	 * @return
+	 */
+	public int getLastNewLineLocation(){
 		
+		if (newline_indexs.size()<2){
+			return -1; //There was no newlines
+		}
+		
+		//last element of array is the length
+		int internalLength = newline_indexs.get(newline_indexs.size()-1); //internal text length (not same as this.contents see below for reasons)
+	
+		
+		Integer lastBundleIndex = newline_indexs.get(newline_indexs.size()-2); //Location of last bundle, HOWEVER:
+		//The index is currently likely not correct, and we have to do a trick to fix it.
+		int lastBundleIndex_fromEnd = internalLength-lastBundleIndex ;
+//		Why the end? glade you asked..
+//		This is because the character count internally is bassed of a string where {@literal <br>'}s have been replaced by \n
+//		Therefor the indexs dont match the ones from the original string you set, or those from "getText()"
+//		As a work-around we thus count from the end of the string. As we are looking for the very last newline, no others could have come
+//		in-between, and thus no other <br>s swapped for \ns. There for the distance from the strings end is the same in each.
+//		
+		//We can now convert back using the original string length. (contents is what the user specified, and getText() returns)
+		lastBundleIndex = this.contents.length() -  lastBundleIndex_fromEnd;
+				
+		return lastBundleIndex;		
 	}
 	
 	
+	
+	
+	public int getFirstNewLineLocation(){
+		if (newline_indexs.size()<2){
+			return -1; //There was no newlines (the last element iin array is always there even if there is no newlines)
+		}
+		
+		Integer nextBundleIndex = newline_indexs.get(0); //works only as its the first newline. See getLastNewLineLocation() for why others are more complex
+		return nextBundleIndex;		
+	}
 
-
-
+	/**
+	 * actually, currently bundle locations
+	 * @return
+	 */
+	public ArrayList<Integer> getNewlineLocations(){
+		return super.newline_indexs;
+	}
 }
