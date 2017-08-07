@@ -382,6 +382,41 @@ public class GwtishWidgetShaderAttribute extends Attribute {
 	}
 
 
+	public void setTo(GwtishWidgetShaderAttribute styleAttribute) {
+		
+		textColour.set(styleAttribute.textColour);
+		outlinerInnerLimit=styleAttribute.outlinerInnerLimit;
+		outlinerOuterLimit=styleAttribute.outlinerOuterLimit; 
+		
+		outlineColour.set(styleAttribute.outlineColour);
+		glowSize=styleAttribute.glowSize; 
+		glowColour.set(styleAttribute.glowColour);
+		
+		shadowColour.set(styleAttribute.shadowColour);
+		shadowXDisplacement=styleAttribute.shadowXDisplacement; 
+		shadowYDisplacement=styleAttribute.shadowYDisplacement;
+		shadowBlur=styleAttribute.shadowBlur;
+		
+		paddingTop=styleAttribute.paddingTop;
+		paddingLeft=styleAttribute.paddingLeft;
+		textScaleingMode=styleAttribute.textScaleingMode;
+		borderWidth=styleAttribute.borderWidth;
+		backColor.set(styleAttribute.backColor);
+		borderColour.set(styleAttribute.borderColour);
+		cornerRadius=styleAttribute.cornerRadius;
+		
+		distanceFieldTextureMap=styleAttribute.distanceFieldTextureMap;
+		
+		filter_brightness=styleAttribute.filter_brightness;
+		filter_contrast=styleAttribute.filter_contrast;
+		filter_hue=styleAttribute.filter_hue;
+		filter_saturation=styleAttribute.filter_saturation;
+		filter_value=styleAttribute.filter_value;
+		transform.setTo(styleAttribute.transform);
+		
+		this.checkShaderRequirements();
+		
+	}
 
 	@Override
 	protected boolean equals (Attribute other) {
@@ -925,6 +960,43 @@ public class GwtishWidgetShaderAttribute extends Attribute {
 	 * 
 	 * @return
 	 */
+	public String getDebugString(){
+		
+		String details = "Debug style:\n";
+		details=details+"Colour:"+textColour.toString()+"\n";
+		details=details+"backColor:"+backColor.toString()+"\n";
+		details=details+"borderColour:"+borderColour.toString()+"\n";
+		details=details+"borderWidth:"+borderWidth+"\n";		
+		details=details+"cornerRadius:"+cornerRadius+"\n";
+
+		details=details+"shadowColour:"+shadowColour.toString()+" shadowXDisplacement:"+shadowXDisplacement+" shadowYDisplacement"+shadowYDisplacement+" shadowBlur:"+shadowBlur+"\n";
+		details=details+"textScaleingMode:"+textScaleingMode+"\n";
+		details=details+"paddingTop:"+paddingTop+" paddingLeft:"+paddingLeft+"\n";
+		details=details+"HasText:"+this.hasText()+" hasProcedralBackground:"+this.hasProcedralBackground()+" HasBCFilter:"+this.hasBCFilter()+""+""+""+""+"\n";
+		details=details+"transform:"+transform.toString()+"\n";
+		
+		
+//		outlinerInnerLimit,
+//		outlinerOuterLimit, 
+//		outlineColour,
+//		glowSize, 
+//		glowColour,
+//		,
+//		filter_brightness,
+//		filter_contrast,
+//		filter_hue,
+//		filter_saturation,
+//		filter_value,
+//		
+		
+		
+		return details;
+		
+	}
+	/**
+	 * 
+	 * @return
+	 */
 	public String debugTransitionStates(){
 
 		String transitionStates = "\n";
@@ -1210,6 +1282,8 @@ public class GwtishWidgetShaderAttribute extends Attribute {
     	 allTransitionStates.clear();
 
 	}
+
+
 
 
 

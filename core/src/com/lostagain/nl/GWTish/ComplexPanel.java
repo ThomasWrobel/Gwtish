@@ -221,7 +221,14 @@ public abstract class ComplexPanel extends Widget {
 				};*/
 		
 	}
+	
+	
+
 	public void clear() {
+		clear(false);
+	}
+	
+	public void clear(boolean disposeWidgets) {
 
 		for (Widget widget : contents) {
 			
@@ -233,8 +240,9 @@ public abstract class ComplexPanel extends Widget {
 			widget.setParent(null);
 			
 			this.removeAttachment(widget);
-			
-		//	widget.dispose(); //err...should we despose? what if its to be reused?
+			if (disposeWidgets){
+			widget.dispose(); //err...should we despose? what if its to be reused?
+			}
 		}
 		contents.clear();
 	}

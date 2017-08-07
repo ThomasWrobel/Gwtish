@@ -29,6 +29,10 @@ public class FlowPanel extends CellPanel {
 	float maxWidth = -1; //no max width, means it acts much like a horizontal panel with the widgets alligned to the top
 
 
+	public float getMaxWidth() {
+		return maxWidth;
+	}
+
 	/**
 	 * Creates a background and lets you position widgets vertical within it
 	 * 

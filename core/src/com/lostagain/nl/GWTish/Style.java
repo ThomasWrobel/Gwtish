@@ -100,6 +100,50 @@ public class Style {
 
 		createTextAttributeIfNeeded();
 	}
+	
+	/**
+	 * 
+	 * @param matchthis
+	 * @param copyZindex 
+	 */
+	public void setStyleToMatch(Style matchthis,boolean copyDistanceFieldTexture, boolean copyZindex) {
+////		
+		this.textHorizontalAlignment = matchthis.textHorizontalAlignment;
+		this.textVerticalAlignment = matchthis.textVerticalAlignment;
+		PaddingLeft = matchthis.PaddingLeft;
+		PaddingTop = matchthis.PaddingTop;
+		PaddingRight = matchthis.PaddingRight;
+		PaddingBottom = matchthis.PaddingBottom;
+		this.lineHeight = matchthis.lineHeight;
+		
+		this.lineHeightUnit = matchthis.lineHeightUnit;
+		
+		this.fontSize = matchthis.fontSize;
+		this.fontSizeUnit = matchthis.fontSizeUnit;
+		this.usedFont = matchthis.usedFont;
+	
+		if (copyDistanceFieldTexture){
+			styleAttribute.setTo( matchthis.styleAttribute );
+		} else {
+			Texture before = this.styleAttribute.distanceFieldTextureMap;
+			styleAttribute.setTo(matchthis.styleAttribute);
+			this.styleAttribute.distanceFieldTextureMap=before; //preserve what we had before copy
+					
+		}
+		
+		//zindex
+		if (copyZindex){
+		this.setZIndex(matchthis.getZIndexValue(), matchthis.getZIndexGroup());
+		}
+		
+		checkShaderRequirements();
+		
+		layoutStyleChanged();
+		
+	}
+	
+	
+	
 
 	/**
 	 * Sets the color of the object.
@@ -207,9 +251,7 @@ public class Style {
 
 			styleAttribute.borderWidth = borderWidth;
 			
-		//	glowingSquare.glowColor = bordercol;
-	//	}
-			styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 			
 	}
 	/**
@@ -227,9 +269,7 @@ public class Style {
 		//if (backStyle!=null){
 
 		styleAttribute.borderColour.set(bordercol);
-		//	glowingSquare.glowColor = bordercol;
-	//	}
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 		
 
 	}
@@ -237,7 +277,7 @@ public class Style {
 	public void setBorderRadius(float radius) {
 	//	createBackgroundAttributeIfNeeded();
 			styleAttribute.cornerRadius = radius;
-			styleAttribute.checkShaderRequirements();
+			checkShaderRequirements();
 			
 	}
 
@@ -268,9 +308,17 @@ public class Style {
 	//	if (textStyle!=null){
 	//		objectsMaterial.set( ColorAttribute.createDiffuse(backcol));
 	//	}
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 
 		
+	}
+
+	/**
+	 * fired everytime a attribute changes that might effect what aspects of the super-shader are built
+	 * (in general, dont touch)
+	 */
+	public void checkShaderRequirements() {
+		styleAttribute.checkShaderRequirements();
 	}
 
 	private void nullParameterCheck(Color backcol) {
@@ -544,7 +592,7 @@ public class Style {
 	 */
 	public void setBrightnessFilter(float brightness){
 		styleAttribute.filter_brightness = brightness;
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 		
 	}
 	
@@ -559,7 +607,7 @@ public class Style {
 	 */
 	public void setContrastFilter(float contrast){
 			styleAttribute.filter_contrast=contrast;
-			styleAttribute.checkShaderRequirements();
+			checkShaderRequirements();
 			
 	}
 	
@@ -575,7 +623,7 @@ public class Style {
 
 	public void setHueFilter(float hue){
 		styleAttribute.filter_hue=hue;
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 		
 	}
 
@@ -591,13 +639,13 @@ public class Style {
 	public void setSaturationFilter(float saturation){
 		
 		styleAttribute.filter_saturation=saturation;
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 		
 	}
 	public void setValueFilter(float value){
 		
 		styleAttribute.filter_value=value;
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 		
 	}
 	
@@ -607,13 +655,13 @@ public class Style {
 	public void setTransformPosition(Vector3 displacement){
 		
 		styleAttribute.transform.position.set(displacement);
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 		
 	}
 	public void setTransformScale(Vector3 scale){
 		
 		styleAttribute.transform.scale.set(scale);
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 		
 	}
 	
@@ -624,7 +672,7 @@ public class Style {
 	public void setTransformRotation(Quaternion rot){
 	
 		styleAttribute.transform.rotation.set(rot);
-		styleAttribute.checkShaderRequirements();
+		checkShaderRequirements();
 	
 	}
 
@@ -993,6 +1041,17 @@ public class Style {
 	
 	static public BitmapFont getDefaultFont() {
 		return FontHandling.standdardFont;
+	}
+
+	public String getStyleDebugString() {
+		return styleAttribute.getDebugString();
+	}
+
+	public void clearSpecifiedLineHeight() {
+		 lineHeight   = -1;
+		 lineHeightUnit = Unit.NOTSET; 		
+
+			layoutStyleChanged();
 	}
 	
 

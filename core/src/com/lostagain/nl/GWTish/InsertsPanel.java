@@ -26,13 +26,16 @@ import com.badlogic.gdx.graphics.Color;
  * addInnerText<br>
  * <br>
  * instead
- * 
+ * //TODO: resizing this panel wont work correctly yet. Widgets will reflow, but labels wont re-wrap, and certainly not recombine when once they were split (which would be ideal)
+//In future we need to at least ensure all labels have correct width set. Even with this though, newlines might be set needlessly early
+
  * @author darkflame
  *
  */		
 //TODO: resizing this panel wont work correctly yet. Widgets will reflow, but labels wont re-wrap, and certainly not recombine when once they were split (which would be ideal)
 //In future we need to at least ensure all labels have correct width set. Even with this though, newlines might be set needlessly early
-//
+//TODO: remove pointless namedpoint copying &or text-parseing from some places
+//TODO: changing styles wont effect sub-labels atm
 //TODO: we might need a option to split all labels by their newlines if this widget might resize
 //this should only be ondemand though, else there might be a lot of wasted objects
 public class InsertsPanel extends FlowPanel {
@@ -78,19 +81,54 @@ public class InsertsPanel extends FlowPanel {
 	}
 
 	
-	private Label getDefaultLabelType(String contents){
+	public InsertsPanel(String contents) {
+		super();
+		currentActiveLabel=setupLabel(contents,null);
+		super.add(currentActiveLabel);
+	}
+
+
+
+
+
+	public InsertsPanel(String contents, float maxWidth) {
+		super(maxWidth);
+
+		currentActiveLabel=setupLabel(contents,null);
+		super.add(currentActiveLabel);
+	}
+
+
+
+
+
+	protected Label getDefaultLabelType(String contents){
 		
 		//make default label
 		Label label = new Label(contents);
 		
 		//now set style stuff
-		label.setInterpretBRasNewLine(true); //as this sort of emulates html
+		label.setInterpretBRasNewLine(interpretBRasNewLine); //as this sort of emulates html
+		label.setInterpretBackslashNasNewLine(interpretBackslashNasNewLine);
+		
 		label.setMaxWidth(super.maxWidth); //ensures never wider then this container. However, inserts may still make textlabels go outside the boundary right now
 
+		
+		//copy the text styles from the parent flowpanel? (ie, ourselves)
+		label.getStyle().setStyleToMatch(getStyle(),false,true);
+		//but we dont want any padding, background or border stuff
+		label.getStyle().clearBackgroundColor();
+		label.getStyle().clearBackgroundImage();
+		label.getStyle().clearBorderColor();
+		label.getStyle().setPadding(0);
+		//
+		
+		
+		//label.getStyle().setColor(Color.RED);
+		//(except for debugging)
 		if (debugMode){
 			label.getStyle().setBorderColor(Color.WHITE);
 		}
-		
 		return label;
 	}
 	
@@ -368,9 +406,10 @@ public class InsertsPanel extends FlowPanel {
 	}
 
 	public void setInnerText(String setThisText){
-		super.clear();
+		super.clear(true);
+		currentActiveLabel=setupLabel(setThisText,null);
 		super.add(currentActiveLabel);
-		this.setupLabel(setThisText, currentActiveLabel);
+		//this.setupLabel(setThisText, currentActiveLabel);
 	//	currentActiveLabel.setText(addThisText);
 
 	}
@@ -893,6 +932,38 @@ public class InsertsPanel extends FlowPanel {
 		//
 
 	}
+	public void setMaxWidth(int sizeInt) {
+		super.setWidth(sizeInt);
+		
+	}
+	public String getText() {
+		String totalText = "";
+		//we need to combine all the labels that are in this object
+		for (Widget widget : super.contents) {
 
+			if (widget instanceof Label){
+				totalText = totalText+((Label)widget).getText();
+			}
+			
+		}
 
+		
+		return totalText;
+	}
+	
+
+	/**
+	 * we can optionally interpret html like br tags as newlines
+	 */
+	private boolean interpretBRasNewLine=true;
+
+	private boolean interpretBackslashNasNewLine=true;
+	
+	public void setInterpretBRasNewLine(boolean interpretBRasNewLine) {
+		 this.interpretBRasNewLine=interpretBRasNewLine;
+		
+	}
+	public void setInterpretBackslashNasNewLine(boolean interpretNLasNewLine) {
+		 this.interpretBackslashNasNewLine=interpretNLasNewLine;
+	}
 }
