@@ -36,7 +36,7 @@ GWTish strengths:
     examplelab.getStyle().setFontSize(42, Unit.PX); 
     examplelab.getStyle().setColor(Color.MAGENTA);
     examplelab.getStyle().setFont(FontHandling.RuslanDisplayFont);
-    examplelab.getStyle().setShadowColor(Color.BLACK);
+    examplelab.getStyle().setShadowColor(Color.BLACK); 
     
 - Even css like animations..
 
