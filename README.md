@@ -16,19 +16,28 @@ Pros/Cons of alternatives;
 - Using static prebuilt textures:
 
 GWTish strengths:
+
 - Quickly add text to your game
-Label examplelab = new Label("Hello World");		
+    Label examplelab = new Label("Hello World");		
+
 - These objects are model instances ready to use
-examplelab.setToPosition(new Vector3(550,-50,0));
+    examplelab.setToPosition(new Vector3(550,-50,0));
+
 - Text looks good upclose thanks to a Distance Field Shader
+
 - Change text whenever you like easily;
-examplelab.setText("New text!...");
+
+     examplelab.setText("New text!...");
+
 - Make the object interactive easily:
+
 - CSS like styleing...
+
     examplelab.getStyle().setFontSize(42, Unit.PX); 
-		examplelab.getStyle().setColor(Color.MAGENTA);
-		examplelab.getStyle().setFont(FontHandling.RuslanDisplayFont);
-		examplelab.getStyle().setShadowColor(Color.BLACK);
+    examplelab.getStyle().setColor(Color.MAGENTA);
+    examplelab.getStyle().setFont(FontHandling.RuslanDisplayFont);
+    examplelab.getStyle().setShadowColor(Color.BLACK);
+    
 - Even css like animations..
 
 		examplelab.getStyle().addTransitionState(StyleParam.color,0.0f,Color.RED);
