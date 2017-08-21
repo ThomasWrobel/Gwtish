@@ -19,9 +19,11 @@ Makes it easy to add streetsigns, readable newspapers or even interactive comput
 ## **GWTish strengths:**
 
 - Quickly add text to your game
+
 `    Label examplelab = new Label("Hello World");`		
 
 - These objects are model instances ready to use
+
 `    examplelab.setToPosition(new Vector3(550,-50,0));`
 
 - Text looks good upclose thanks to a Distance Field Shader
@@ -52,7 +54,7 @@ Makes it easy to add streetsigns, readable newspapers or even interactive comput
     
 - Build complex layouts using various panels;
 
-(recently split from my meshexplorer project, so details are still there for now)
+(recently split from my meshexplorer project, so some details are still there for now)
 
 see;
 https://github.com/ThomasWrobel/MeshExplorerGDX/wiki/Gwtish-widget-examples
