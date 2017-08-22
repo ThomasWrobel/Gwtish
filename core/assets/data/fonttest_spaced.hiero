@@ -1,0 +1,25 @@
+font.name=Arial Black
+font.size=32
+font.bold=false
+font.italic=false
+
+font2.file=
+font2.use=false
+
+pad.top=5
+pad.right=7
+pad.bottom=5
+pad.left=7
+pad.advance.x=-8
+pad.advance.y=-8
+
+glyph.native.rendering=false
+glyph.page.width=512
+glyph.page.height=256
+glyph.text=ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n1234567890-\n"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*#
+
+effect.class=com.badlogic.gdx.tools.hiero.unicodefont.effects.DistanceFieldEffect
+effect.Color=ffffff
+effect.Scale=32
+effect.Spread=4.0
+

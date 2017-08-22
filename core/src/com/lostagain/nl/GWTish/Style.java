@@ -876,6 +876,10 @@ public class Style {
 		layoutStyleChanged();
 	}
 	
+	public String getPadding() {
+		return PaddingTop+" "+PaddingRight+" "+PaddingBottom+" "+PaddingLeft;
+	}
+	
 	/**
 	 * Sets this widgets left padding.
 	 * This will set the shader to render any text inwards by this amount, as well as setting the left padding variable 

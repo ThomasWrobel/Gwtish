@@ -122,6 +122,7 @@ public class InsertsPanel extends FlowPanel {
 		label.getStyle().clearBorderColor();
 		label.getStyle().setPadding(0);
 		//
+		Log.info("created label:"+label.getText()+" padding:"+label.getStyle().getPadding());
 		
 		
 		//label.getStyle().setColor(Color.RED);
@@ -216,6 +217,11 @@ public class InsertsPanel extends FlowPanel {
 	 
 	//private
 	 Label setupLabel(String contents,Label existing,boolean addToExisting) {
+		 
+		 //normalize newlines to \n
+		 if (interpretBackslashNasNewLine){
+		 contents=Label.standardiseNewlinesStatic(contents);
+		 }
 		 
 		//
 		//first we pre-process to remember any insert points
@@ -507,7 +513,7 @@ public class InsertsPanel extends FlowPanel {
 					//
 					//need to get beforer/after insertpoints too, to copy into new labels
 					//
-					splitInsertPointsBetween(lab, insertstart, afterlab, beforelab);
+					splitInsertPointsBetween(lab, insertstart, insertstart,afterlab, beforelab);
 					
 					
 					//now we remove the old label we split
@@ -575,11 +581,11 @@ public class InsertsPanel extends FlowPanel {
 
 
 
-	private void splitInsertPointsBetween(Label sourcelab, int splitpoint, Label afterlab, Label beforelab) {
+	private void splitInsertPointsBetween(Label sourcelab, int splitpoints, int splitpointe, Label afterlab, Label beforelab) {
 		NamedPointSet sourcepoints = this.allKnowenInsertPoints.get(sourcelab);
 		if (sourcepoints!=null){
-			NamedPointSet beforepoints = sourcepoints.getPointsBefore(splitpoint);
-			NamedPointSet afterpoints = sourcepoints.getPointsAfter(splitpoint);
+			NamedPointSet beforepoints = sourcepoints.getPointsBefore(splitpoints);
+			NamedPointSet afterpoints = sourcepoints.getPointsAfter(splitpointe);
 			if (afterlab!=null){	
 				allKnowenInsertPoints.put(afterlab, afterpoints);
 			}
@@ -647,13 +653,23 @@ public class InsertsPanel extends FlowPanel {
 			return;
 		}
 		
-		Log.info("lastnl:\n"+lastnl);
-		Log.info("prev chars:"+labtext.substring(0,lastnl));
+		//the returned lastnl point might follow a <br> or nl that caused it (if it wasnt auto wrapped)
+		//these should be removed, so we have a extra number of chars we count back based on the length of what caused the newline
+		int extracountback=0;
+		if (lab.isInterpretBRasNewLine() && labtext.substring(0,lastnl).endsWith("<br>")){
+			extracountback="<br>".length();	
+		} else	if (lab.isInterpretBackslashNasNewLine() && labtext.substring(0,lastnl).endsWith("\n")){
+			extracountback="\n".length();	
+		}
+		
+		
+		Log.info("lastnl:"+lastnl);
+		Log.info("prev chars:"+labtext.substring(0,lastnl-extracountback));
 		Log.info("next chars:"+labtext.substring(lastnl));
 		
 		int newlineendloc = lastnl;//+newlinetype.length();
 
-		insertNewLinebetween(lab, lastnl, newlineendloc);
+		insertNewLinebetween(lab, lastnl-extracountback, newlineendloc);
 
 
 		return ;
@@ -711,13 +727,36 @@ public class InsertsPanel extends FlowPanel {
 			Log.info("no newlines");
 			return;
 		}
-		Log.info("next_nl:\n"+next_nl);
-		Log.info("prev chars:"+labtext.substring(0,next_nl));
-		Log.info("next chars:"+labtext.substring(next_nl));
 		
+		//the returned nextnl point might be followed by a <br> or nl that caused it (if it wasnt auto wrapped)
+		//these should be removed, so we have a extra number of chars we count forward based on the length of what caused the newline
+		int extracountforward=0;
+		if (lab.isInterpretBRasNewLine() && labtext.substring(next_nl).startsWith("<br>")){
+			extracountforward="<br>".length();	
+		} else if (lab.isInterpretBackslashNasNewLine() && labtext.substring(next_nl).startsWith("\n")){
+			extracountforward="\n".length();	
+		}
+		
+		Log.info("next_nl:"+next_nl+" cf:"+extracountforward+"  "+lab.isInterpretBackslashNasNewLine());
+		Log.info("prev chars:"+labtext.substring(0,next_nl));
+		String substring = labtext.substring(next_nl+extracountforward);
+		Log.info("next chars:"+substring);
+//		if (substring.startsWith("\n")){
+//			Log.info("______________true");					
+//		}
+//		if (substring.startsWith("\r\n")){
+//			Log.info("______kl;________true");					
+//		}
+//		if (substring.contains("\n")){
+//			Log.info("______nl at:"+substring.indexOf("\n"));		
+//			Log.info("______nl at:"+substring.substring(0, 2));	
+//			Log.info("______nl at:"+substring.charAt(0));
+//			
+//				
+//		}
 		int newlineendloc = next_nl;//+newlinetype.length();
 
-		insertNewLinebetween(lab, next_nl, newlineendloc);
+		insertNewLinebetween(lab, next_nl, newlineendloc+extracountforward);
 
 
 		return ;
@@ -799,7 +838,7 @@ public class InsertsPanel extends FlowPanel {
 		//
 		//need to get beforer/after insertpoints too, to copy into new labels
 		//
-		splitInsertPointsBetween(lab, newlinestartloc, afterlab, beforelab);
+		splitInsertPointsBetween(lab, newlinestartloc,newlineendloc, afterlab, beforelab);
 		
 		
 		//now we remove the old label we split

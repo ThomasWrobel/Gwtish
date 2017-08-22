@@ -1127,9 +1127,11 @@ public class GWTishModelManagement {
 		//Gdx.app.log(logstag,"_-mousedownOn:"+mousedownOn.size);
 	}
 
-	public void dispose() {
+	
+	public static void dispose() {
 
-
+		animatingobjects.clear();
+		movingObjects.clear();
 		modelBatch.dispose();
 
 	}
@@ -1241,7 +1243,7 @@ public class GWTishModelManagement {
 				GWTishModelManagement.currentTouchState = GWTishModelManagement.TouchState.TouchDown; //if we previously were a new touchdown, then now we are a non-new touchdown
 
 				//currently duplicated elsewhere in MainExplorationView				
-				Log.info(" new touch down");
+			//	Log.info(" new touch down");
 				GWTishModelManagement.touchStartedAt = new Vector2(Gdx.input.getX(),Gdx.input.getY());
 
 

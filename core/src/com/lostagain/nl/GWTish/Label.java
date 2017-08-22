@@ -92,8 +92,13 @@ public class Label extends LabelBase {
 
 	private boolean interpretBackslashNasNewLine=true;
 
+	public boolean isInterpretBackslashNasNewLine() {
+		return interpretBackslashNasNewLine;
+	}
 	/**
 	 * interpret \n as newlines
+	 * Note;  \r\n or \n\r will be converted to just \n
+	 * 
 	 * defaults to true	
 	 * @param interpretBackslashNasNewLine
 	 */
@@ -207,7 +212,8 @@ public class Label extends LabelBase {
 
 		super(generateObjectData(true, true, contents, interpretBRasNewLine,interpretNLasNewLine,sizeMode, MaxWidth, MaxHeight, modelAlignement,textAlignment,null));
 		super.setStyle(this.getTextMaterial()); //no style settings will work before this is set
-
+		contents = standardiseNewlines(contents);
+		
 		this.lastUsedTextAlignment = textAlignment;
 		this.userData="label_"+contents;
 
@@ -328,12 +334,14 @@ public class Label extends LabelBase {
 			font=null;
 			NativeToSceneRatio=1.0f; //randomvalue, no real effect with empty texture
 		} else {
-
+			
 			font          = getEffectiveFont(style);
 			NativeToSceneRatio = getNativeToSceneResizeRatio(style, font);
 
 		}
-
+		if (interpretNLasNewLine){
+		contents = standardiseNewlinesStatic(contents);
+		}
 		int startFromX =0;
 		int startFromY =0;
 		Pixmap addToThis = null;
@@ -1078,12 +1086,25 @@ public class Label extends LabelBase {
 	 * Sets the text and regenerates the texture 
 	 **/
 	public void setText(String text){
+		text = standardiseNewlines(text);
+		
 		this.contents=text;
 
 		//todo; check if we can add instead?
 
 		regenerateTexture(text,null);
 
+	}
+	
+	public String standardiseNewlines(String text) {
+		if (interpretBackslashNasNewLine){
+			text = standardiseNewlinesStatic(text);			
+		}
+		return text;
+	}
+	static String standardiseNewlinesStatic(String text) {
+		text=text.replaceAll("\\r\\n|\\r|\\n", "\n");
+		return text;
 	}
 
 	/**
@@ -1096,7 +1117,7 @@ public class Label extends LabelBase {
 		if (text.isEmpty()){
 			return; // no op
 		}
-
+		text = standardiseNewlines(text);
 		this.contents=contents+text;
 
 		Log.info("adding: "+text+" to existing text");
@@ -1712,7 +1733,7 @@ Text size remains just h/w, however
 
 	/**
 	 * Returns the index of the last newline.<br>
-	 * Or , to be exact, the last bundles distance relative to the END of the string.<br>
+	 * Or , to be exact, the last bundles <br>
 	 * <br>
 	 * <br>
 	 * A newline can be originally caused  by a \n , a {@literal<br>} , or auto-wrapping<br>
@@ -1763,4 +1784,6 @@ Text size remains just h/w, however
 	public ArrayList<Integer> getNewlineLocations(){
 		return super.newline_indexs;
 	}
+	
+	
 }

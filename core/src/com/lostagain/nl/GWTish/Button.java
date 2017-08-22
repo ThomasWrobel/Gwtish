@@ -32,6 +32,10 @@ public class Button extends DeckPanel {
 
 	public Label Caption;
 
+	public Label getCaption() {
+		return Caption;
+	}
+
 	/**
 	 * creates a button with specified size and runnable when clicked
 	 * @param sizeX

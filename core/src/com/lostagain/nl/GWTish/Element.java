@@ -83,7 +83,15 @@ public class Element extends AnimatableModelInstance {
 		//create and return a HandlerRegistration
 		return new HandlerRegistration(this,handler);
 	}
+	public void addHandlers(Element copyFromThis) {
+		
+		
+		//if no handlers yet exist ensure we are hitable
+				ensureHandlers();
 
+				//add new handlers
+				handlers.addAll(copyFromThis.handlers);
+	}
 	public HandlerRegistration addClickHandler(ClickHandler handler) 
 	{
 		return addHandler(handler);
