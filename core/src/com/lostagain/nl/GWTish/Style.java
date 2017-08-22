@@ -844,7 +844,7 @@ public class Style {
 	 * @param size
 	 * @param unit (px only for now)
 	 */
-	public void setFontSize(int size, Unit unit) {
+	public void setFontSize(double size, Unit unit) {
 		fontSize = size;
 		fontSizeUnit = unit;
 		//setting the font size might change the layout a lot

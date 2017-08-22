@@ -86,7 +86,8 @@ public class HorizontalPanel extends CellPanel {
 			currentTotalWidgetWidth=currentTotalWidgetWidth+incomingWidth+spaceing;
 	//	}
 
-		return new Vector3(getLeftPadding()+newLocationX,-getTopPadding()+newLocationY,3f); //messureing from topleft downwards hence inverting the padding
+		float zdisplace = 0f; //3f
+		return new Vector3(getLeftPadding()+newLocationX,-getTopPadding()+newLocationY,zdisplace); //messureing from topleft downwards hence inverting the padding
 
 
 	}

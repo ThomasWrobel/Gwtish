@@ -39,8 +39,8 @@ public class Gwtish extends ApplicationAdapter {
 
 		cam = new PerspectiveCamera(67,w,h);
 
-		cam.position.set(0f, 0f, 225f); //overhead
-		cam.lookAt(0,0,0);
+		cam.position.set(-150f, 190f, 75f); //overhead
+		cam.lookAt(0,100,0);
 		cam.near = 0.5f;
 		cam.far = 1000f;
 		cam.update();

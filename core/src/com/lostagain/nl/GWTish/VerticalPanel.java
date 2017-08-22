@@ -78,11 +78,11 @@ public class VerticalPanel extends CellPanel {
 		Log.info( index + " adding incomingHeight: "
 				+ incomingHeight + " total=" + currentTotalWidgetHeight);
 
-				
+		float zdisplace = 0f; //3f
 		
 		return new Vector3(newLocationX, 
 				-(getTopPadding()	+ newLocationY), //messureing from top left, hence the negative
-				3f);
+				zdisplace);
 
 		
 		//return new Vector3(getLeftPadding() + newLocationX, 

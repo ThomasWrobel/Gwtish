@@ -185,10 +185,10 @@ public class FlowPanel extends CellPanel {
 	//	if (updateWidth){
 		//	currentTotalWidgetWidth=newTotalWidthOfCurrentRow;
 	//	}
-		
+	float	zdisplace = 0f;
 		
 
-		return new Vector3(getLeftPadding()+newLocationX,-getTopPadding()+newLocationY,3f); //Measuring from topleft downwards hence inverting the padding
+		return new Vector3(getLeftPadding()+newLocationX,-getTopPadding()+newLocationY,zdisplace); //Measuring from topleft downwards hence inverting the padding
 
 
 	}
