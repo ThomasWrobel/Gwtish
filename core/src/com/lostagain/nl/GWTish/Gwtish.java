@@ -10,7 +10,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Vector2;
 import com.lostagain.nl.GWTish.Management.GWTishModelManagement;
 
@@ -18,20 +21,23 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.lostagain.nl.GWTish.tests.DemoScene;
 
 /**
- * not used.
- * In future I might have some tests here, in the meantime see package info for details of this lib
+ * used to setup scene tests
  * @author darkflame
  *
  */
 public class Gwtish extends ApplicationAdapter {
 
+	
+
 	final static String logstag = "GdxScoreTester";
 	public static Logger Log = Logger.getLogger(logstag); 
-	PerspectiveCamera cam;
-	public CameraInputController camController;
+	public static PerspectiveCamera cam;
+//	public CameraInputController camController;
 	//-----------------------------------
 	//------------
+	FirstPersonCameraController fpscontrols;
 	
+	Environment environment;
 	@Override
 	public void create () {
 		float w = Gdx.graphics.getWidth();		
@@ -39,17 +45,20 @@ public class Gwtish extends ApplicationAdapter {
 
 		cam = new PerspectiveCamera(67,w,h);
 
-		cam.position.set(-150f, 190f, 75f); //overhead
-		cam.lookAt(0,100,0);
+		cam.position.set(-150f, 150f, 75f); //overhead
+		cam.lookAt(0,150,0);
 		cam.near = 0.5f;
 		cam.far = 1000f;
 		cam.update();
 
 		Log.info("camera setup ");
 		
-		camController = new CameraInputController(cam);
-		Gdx.input.setInputProcessor(camController);
+		//camController = new CameraInputController(cam);
+		 fpscontrols = new FirstPersonCameraController(cam);
+		 fpscontrols.setVelocity(60f);
+		Gdx.input.setInputProcessor(fpscontrols);
 
+		
 		Log.info("camera controller setup ");
 		
 		//GWTish has its own model manager that must be setup
@@ -80,9 +89,6 @@ public class Gwtish extends ApplicationAdapter {
 		
 	}
 
-	
-	Environment environment;
-
 	@Override
 	public void render () {
 		  if (loading && assets.update())
@@ -98,6 +104,9 @@ public class Gwtish extends ApplicationAdapter {
 		float delta = Gdx.graphics.getDeltaTime(); //in seconds!
 		GWTishModelManagement.updateTouchState();		
 
+		
+		fpscontrols.update(delta);
+		
 		//----------- Handle interactions:
 		float xc = Gdx.input.getX();
 		float yc = Gdx.input.getY();
