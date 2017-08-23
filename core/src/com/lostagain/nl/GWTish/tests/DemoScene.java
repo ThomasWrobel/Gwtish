@@ -36,9 +36,11 @@ public class DemoScene {
 	//		GWTishModelManagement.addmodel(wallInstance);		
 		 
 		//set all "background" models loading
-		//Wall;
+		//Walls etc;
 			Gwtish.assets.load("walls.g3db", Model.class);
 			Gwtish.assets.load("floor.g3db", Model.class);
+			Gwtish.assets.load("roof_reflect.g3db", Model.class);
+			Gwtish.assets.load("roof.g3db", Model.class);
 			
 		//Edge:
 			Gwtish.assets.load("flooredge.g3db", Model.class);
@@ -103,7 +105,7 @@ public class DemoScene {
 					@Override
 					public void onClick() {
 						// move cam
-						Gwtish.cam.position.set(-25f, 120f, -85f); //focus on calender
+						Gwtish.cam.position.set(-25f, 120f, -95f); //focus on calender
 						Gwtish.cam.lookAt(5f, 97, -95);
 					}
 				});
@@ -129,6 +131,12 @@ public class DemoScene {
 	        ModelInstance flooredgeInstance = new ModelInstance(flooredge); 
 	        GWTishModelManagement.addmodel(flooredgeInstance);		
 //		
+	        Model roof = Gwtish.assets.get("roof.g3db", Model.class);
+	        ModelInstance roofInstance = new ModelInstance(roof); 
+	        GWTishModelManagement.addmodel(roofInstance);	
+	        Model roof_reflect = Gwtish.assets.get("roof_reflect.g3db", Model.class);
+	        ModelInstance roof_reflectInstance = new ModelInstance(roof_reflect); 
+	        GWTishModelManagement.addmodel(roof_reflectInstance);	
 //
 	        Model table = Gwtish.assets.get("table.g3db", Model.class);
 	        ModelInstance tableInstance = new ModelInstance(table); 
