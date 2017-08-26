@@ -21,7 +21,9 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.lostagain.nl.GWTish.tests.DemoScene;
 
 /**
- * used to setup scene tests
+ * Used to setup scene tests
+ * 
+ * 
  * @author darkflame
  *
  */
@@ -32,54 +34,32 @@ public class Gwtish extends ApplicationAdapter {
 	final static String logstag = "GdxScoreTester";
 	public static Logger Log = Logger.getLogger(logstag); 
 	public static PerspectiveCamera cam;
-//	public CameraInputController camController;
-	//-----------------------------------
-	//------------
-	FirstPersonCameraController fpscontrols;
 	
 	Environment environment;
+	
+	
 	@Override
 	public void create () {
 		float w = Gdx.graphics.getWidth();		
 		float h = Gdx.graphics.getHeight();
-
+	
 		cam = new PerspectiveCamera(67,w,h);
-
-		cam.position.set(-150f, 150f, 75f); //overhead
-		cam.lookAt(0,150,0);
-		cam.near = 0.5f;
-		cam.far = 1000f;
-		cam.update();
-
-		Log.info("camera setup ");
 		
-		//camController = new CameraInputController(cam);
-		 fpscontrols = new FirstPersonCameraController(cam);
-		 fpscontrols.setVelocity(60f);
-		Gdx.input.setInputProcessor(fpscontrols);
+		DemoScene.setupForDemoScene(Gwtish.cam);
 
-		
-		Log.info("camera controller setup ");
-		
-		//GWTish has its own model manager that must be setup
-		//This is required for distance field fonts to render correctly.
-		GWTishModelManagement.setup(); 
-
-		Log.info("GWTishModelManagement setup  ");
-		
 		sceneTest();
 
 		
 		Log.info("setup ended");
-
 	}
-	  
-	public static AssetManager assets;
+
+
+	public  AssetManager assetsmanager;	
 	boolean loading = false;
 	  
 	private void sceneTest() {
 		
-        assets = new AssetManager();
+		assetsmanager = new AssetManager();
         loading = true;
         
 		// a test scene to show/test gwtish functionality (this will add stuff to load)
@@ -88,10 +68,17 @@ public class Gwtish extends ApplicationAdapter {
 		
 		
 	}
+	
+	
+	static public AssetManager getAssetManager(){
+		
+		return ((Gwtish)Gdx.app.getApplicationListener()).assetsmanager;
+		
+	}
 
 	@Override
 	public void render () {
-		  if (loading && assets.update())
+		  if (loading && assetsmanager.update())
 		  {
 			  DemoScene.doneLoading();
 			  loading = false;
@@ -105,7 +92,7 @@ public class Gwtish extends ApplicationAdapter {
 		GWTishModelManagement.updateTouchState();		
 
 		
-		fpscontrols.update(delta);
+		DemoScene.fpscontrols.update(delta);
 		
 		//----------- Handle interactions:
 		float xc = Gdx.input.getX();
@@ -124,8 +111,14 @@ public class Gwtish extends ApplicationAdapter {
 	}
 	
 	@Override
+	public void resume() {
+		super.resume();
+	}
+
+	@Override
 	public void dispose () {
 
+		assetsmanager.dispose();
 		GWTishModelManagement.dispose();
 	}
 }

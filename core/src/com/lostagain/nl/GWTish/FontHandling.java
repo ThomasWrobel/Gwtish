@@ -60,7 +60,7 @@ public class FontHandling {
 	//public static BitmapFont SchoolbellFont = new BitmapFont(Gdx.files.internal("data/fonts/Schoolbell.fnt"), new TextureRegion(SchoolbellTexture), true); //font file says size is 32
 
 	
-	static HashMap<BitmapFont,Float> sizecache = new HashMap<BitmapFont,Float>();
+	protected static HashMap<BitmapFont,Float> sizecache = new HashMap<BitmapFont,Float>();
 	
 	public static void cacheFontSizes(){
 		

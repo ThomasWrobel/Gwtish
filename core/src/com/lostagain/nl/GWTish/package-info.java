@@ -3,7 +3,9 @@
  * That is, a collection of model instances, model manager, and specific shader to easily allow you to do things like the following in your 3d game;<br>
  * <br>
  *  - Streetsigns (One line "label" object can do this)<br>
+ *  - Newspapers (built from various layout panel widgets)<br>
  *  - Computer interfaces (Labels and images can be compossed in panels of various sorts, and interactivity added by simple .addClickHandler(..) on the objects)<br>
+ *  <br>
  *  - All widgets can have interactivity, but special buttons are supplied too.<br>
  *  - Widgets can be arbitarily attached together, if one moves the other will too as if fixed too it<br>
  *  - Label objects can have lots of css-like styling applied very easily....including animations!<br>
@@ -18,7 +20,7 @@
  *  * why not use Scene2D?<br>
  *  Because its 2D :) If libgdxs built in lib is good for your game/app, use it! Its more stable/mature then this.<br>
  *  If, however, you need text objects that correctly occlude behind objects in your 3d game, this is probably easier.<br>
- *  
+ *  <br>
  *  * why not use just a texture for signs?<br>
  *  Sure, if you just got one or two, and only want one language supported. <br>
  *  If you need a selection of text, or it potential can change, GWTish labels will probably save you a lot of work<br>
@@ -42,8 +44,10 @@
 	* 4. Add in render() for interactivity support;<br>
 	* 	GWTishModelManagement.updateTouchState();	<br>
 		GWTishModelManagement.updateObjectMovementAndFrames(delta);<br>
-	<br>
+	<br>	
  *  <br>
+ *  You can also look at the example scene in:<br>
+ *  com.lostagain.nl.GWTish.tests.DemoScene<br>
  *<br>
  * @author Thomas Wrobel  (with help from Xoppa and thanks to the whole libgdx community)
  *
