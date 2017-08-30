@@ -116,9 +116,15 @@ public class DemoScene {
 
 		//computer screen
 		//?
+		
+		
 		//whiteboard
-		//?
-
+		VerticalPanel whiteboardframe = getWhiteBoard();
+		// position whiteboardframe
+		whiteboardframe.setToPosition(new Vector3(170, 200, -80));
+		whiteboardframe.setToRotation(new Quaternion(Vector3.Y, -90).mul(new Quaternion(Vector3.X, 0)).mul(new Quaternion(Vector3.Z, -2)));
+		
+		GWTishModelManagement.addmodel(whiteboardframe);	
 		//now we add simple interactions:
 		//
 		//Newspaper click
@@ -126,8 +132,8 @@ public class DemoScene {
 			@Override
 			public void onClick() {
 				// move cam
-				activecam.position.set(-80f, 160f, -75f); //focus on newspaper
-				activecam.lookAt(12, 90, -65);
+				activecam.position.set(-40f, 140f, -75f); //focus on newspaper
+				activecam.lookAt(12, 30, -65);
 			}
 		});
 
@@ -230,18 +236,27 @@ public class DemoScene {
 		Label spacer = new Label(" ~~ ");		
 		Label date = new Label("16th Oct");
 
-		Label headline = new Label("Headline~");
-		Label subheadline = new Label("Subheading");
+		final Label headline = new Label("Person looks at headline",35);
+		final Label subheadline = new Label("is mildly confused at metalevel",35);
 		HorizontalPanel horizontalFrame = new HorizontalPanel();
-		Label randomtext1 = new Label("gfhfgfhffghgfhfghfhfhfghgfhfghfhfhfghgfhfghfhfhfghgfhfghfhfhfhfhfghgfhfghfhfhfghgfhfghgfhfghfhfhfghgfhfghfhffhfhfghgfhfghfhfhfghgfhfghfhfhfgh",14);
+		Label randomtext1 = new Label("It was an ordinary morning when J (name witheld due to privacy concerns) stared with bemusement at the headline. Soon after, their attention switched to the text below.",14);
 
 		VerticalPanel rightPanelFrame = new VerticalPanel();
 		Image npimage =new Image ("badlogic.jpg");
 		npimage.setSizeAs(12, 12);
 
-		Label randomtext2 = new Label("jkhjkhjkhkjkhkjkhjkhjkhkjkhkjkhjkhjkhkjkhkjkhjkhjkhkjkhkhjkhjkhkjkhk",14);
+		Label randomtext2 = new Label("Quite possibly not J.",14);
 
-
+		headline.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick() {
+				headline.setText("Person clicks headline");
+				subheadline.setText("Does not understand how paper works");
+				
+			}
+		});
+		
 
 		//layout
 		dateandprice.add(price,spacer,date);
@@ -251,8 +266,10 @@ public class DemoScene {
 
 		horizontalFrame.setCellVerticalAlignment(rightPanelFrame, VerticalAlignment.Top);
 
-		dateandprice.setSpaceing(2f);
+		dateandprice.setSpaceing(2);
 
+
+		
 		overallFrame.add(dateandprice,headline,subheadline,horizontalFrame);
 		horizontalFrame.add(randomtext1,rightPanelFrame);
 		//	horizontalFrame.setSpaceing(7f);
@@ -270,8 +287,8 @@ public class DemoScene {
 		subheadline.getStyle().setColor(Color.BLACK);
 		randomtext1.getStyle().setColor(Color.BLACK);
 		randomtext2.getStyle().setColor(Color.BLACK);
-		headline.getStyle().setShadowX(0.6f);
-		headline.getStyle().setShadowY(0.6f);
+		headline.getStyle().setShadowX(0.1f);
+		headline.getStyle().setShadowY(0.1f);
 
 		subheadline.getStyle().setShadowX(0.10f);
 		subheadline.getStyle().setShadowY(0.10f);
@@ -283,16 +300,21 @@ public class DemoScene {
 		randomtext1.getStyle().setStyleToMatch(subheadline.getStyle(), false, false);
 		randomtext2.getStyle().setStyleToMatch(subheadline.getStyle(), false, false);
 		//randomtext1.getStyle().setStyleToMatch(subheadline.getStyle(), false, false);
+		
+		headline.getStyle().setPaddingRight(3);
+		headline.getStyle().setPaddingLeft(3);
+		subheadline.getStyle().setPaddingRight(3);
+		subheadline.getStyle().setPaddingLeft(3);
 
 		//size
-		price.getStyle().setFontSize(3, Unit.PX);
-		spacer.getStyle().setFontSize(3, Unit.PX);		
-		date.getStyle().setFontSize(3, Unit.PX);
+		price.getStyle().setFontSize(2, Unit.PX);
+		spacer.getStyle().setFontSize(2, Unit.PX);		
+		date.getStyle().setFontSize(2, Unit.PX);
 
-		headline.getStyle().setFontSize(6, Unit.PX);
-		subheadline.getStyle().setFontSize(4, Unit.PX);
-		randomtext1.getStyle().setFontSize(2, Unit.PX);
-		randomtext2.getStyle().setFontSize(2, Unit.PX);
+		headline.getStyle().setFontSize(4, Unit.PX);
+		subheadline.getStyle().setFontSize(2.5, Unit.PX);
+		randomtext1.getStyle().setFontSize(1.5, Unit.PX);
+		randomtext2.getStyle().setFontSize(1.5, Unit.PX);
 
 
 		//
@@ -301,6 +323,54 @@ public class DemoScene {
 
 
 		return overallFrame;
+	}
+	
+
+	
+	
+	/**
+	 * Vertical panel for the whiteboard.
+	 * @return
+	 */
+	
+	private static VerticalPanel getWhiteBoard() {
+		
+		
+		VerticalPanel whiteboardframe = new VerticalPanel();
+		
+		Label whiteboardtext = new Label("Question: \n Do we really need four walls to save us from the outside void? \n \n Also: \n The Void, friend or friendlier?",200);
+		whiteboardtext.getStyle().setColor(Color.BLACK);
+		whiteboardtext.getStyle().setFontSize(6, Unit.PX);
+		whiteboardtext.getStyle().setShadowY(0.1f);
+		whiteboardtext.getStyle().setShadowX(0.1f);
+		
+		whiteboardframe.add(whiteboardtext);
+		
+		return whiteboardframe;
+		}
+	
+	/**
+	 * VerticalPanel for computerscreen
+	 * 
+	 */
+
+	private static VerticalPanel getComputerScreen() {
+		
+		VerticalPanel computerscreenframe = new VerticalPanel();
+		
+		Label computerscreentext = new Label("_",50);
+		computerscreentext.getStyle().setColor(Color.BLACK);
+		computerscreentext.getStyle().setFontSize(6, Unit.PX);
+		computerscreentext.getStyle().setShadowY(0.1f);
+		computerscreentext.getStyle().setShadowX(0.1f);
+		
+		// style for positioning
+		computerscreenframe.getStyle().setBackgroundColor(Color.CYAN);
+		
+		computerscreenframe.add(computerscreentext);
+		return computerscreenframe;
+		
+		
 	}
 	
 	static Camera activecam;
