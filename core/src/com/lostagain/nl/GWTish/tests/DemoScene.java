@@ -18,6 +18,7 @@ import com.lostagain.nl.GWTish.HorizontalPanel;
 import com.lostagain.nl.GWTish.Image;
 import com.lostagain.nl.GWTish.Label;
 import com.lostagain.nl.GWTish.VerticalPanel;
+import com.lostagain.nl.GWTish.Management.AnimatableModelInstance;
 import com.lostagain.nl.GWTish.Management.GWTishModelManagement;
 import com.lostagain.nl.GWTish.Style.Unit;
 
@@ -66,7 +67,7 @@ public class DemoScene {
 		//Edge:
 		assetsmanager.load("flooredge.g3db", Model.class);
 		//Desk	
-		assetsmanager.load("table.g3db", Model.class);
+		assetsmanager.load("table_centered.g3db", Model.class);
 		//Computer:	
 		assetsmanager.load("computer.g3db", Model.class);
 		//paper:	
@@ -170,9 +171,11 @@ public class DemoScene {
 		ModelInstance roof_reflectInstance = new ModelInstance(roof_reflect); 
 		GWTishModelManagement.addmodel(roof_reflectInstance);	
 		//
-		Model table = assetsmanager.get("table.g3db", Model.class);
-		ModelInstance tableInstance = new ModelInstance(table); 
+		Model table = assetsmanager.get("table_centered.g3db", Model.class);
+		AnimatableModelInstance tableInstance = new AnimatableModelInstance(table); 
+		tableInstance.setToPosition(new Vector3(-23.609f, 85.806f, -74.658f));
 		GWTishModelManagement.addmodel(tableInstance);	
+		
 
 		Model cal = assetsmanager.get("cal.g3db", Model.class);
 		ModelInstance calInstance = new ModelInstance(cal); 
