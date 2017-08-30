@@ -198,7 +198,7 @@ public class Widget extends Element {
 
 		Log.info(" offsetFor "+alignment+" of "+sizeX+","+sizeY+" is "+offset);
 		
-		Model newModel = ModelMaker.createRectangle(offset.x, (offset.y), sizeX+offset.x,(sizeY+offset.y), 0, mat); 	
+		Model newModel = ModelMaker.createRectangle(offset.x, (offset.y), sizeX+offset.x,(sizeY+offset.y), 0, null,mat,true); 	
 		
 		
 		
