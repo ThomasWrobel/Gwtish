@@ -20,6 +20,7 @@ import com.lostagain.nl.GWTish.Label;
 import com.lostagain.nl.GWTish.VerticalPanel;
 import com.lostagain.nl.GWTish.Management.AnimatableModelInstance;
 import com.lostagain.nl.GWTish.Management.GWTishModelManagement;
+import com.lostagain.nl.GWTish.shader.GwtishWidgetShaderAttribute.StyleParam;
 import com.lostagain.nl.GWTish.Style.Unit;
 
 /**
@@ -95,8 +96,6 @@ public class DemoScene {
 		setupBackgroundModels();	
 		//(displays 3d model files loaded by asset manager)
 
-
-		//    
 		//________________create newspaper text
 		VerticalPanel newspaperFrame = getNewsPaper();
 
@@ -104,7 +103,7 @@ public class DemoScene {
 		newspaperFrame.setToPosition(new Vector3(12, 90, -65));
 		newspaperFrame.setToRotation(new Quaternion(Vector3.X, -90).mul(new Quaternion(Vector3.Z, -104)));
 
-		GWTishModelManagement.addmodel(newspaperFrame);	
+		GWTishModelManagement.addmodel(newspaperFrame);	// necessary if you want to render the actual verticalpanel on screen.
 
 		//________________create calander date
 		VerticalPanel calframe = getCal();
@@ -114,9 +113,7 @@ public class DemoScene {
 
 		GWTishModelManagement.addmodel(calframe);	
 
-		//computer screen
-		//?
-		
+
 		
 		//whiteboard
 		VerticalPanel whiteboardframe = getWhiteBoard();
@@ -125,6 +122,26 @@ public class DemoScene {
 		whiteboardframe.setToRotation(new Quaternion(Vector3.Y, -90).mul(new Quaternion(Vector3.X, 0)).mul(new Quaternion(Vector3.Z, -2)));
 		
 		GWTishModelManagement.addmodel(whiteboardframe);	
+		
+		
+		//computer screen
+		VerticalPanel computerscreenframe = getComputerScreen();
+		// position computer
+		computerscreenframe.setToPosition(new Vector3(-21, 132, -154));
+	//	computerscreenframe.setToRotation(new Quaternion(Vector3.X, 45));
+		computerscreenframe.setToRotation(new Quaternion(Vector3.Y, -47.5f).mul(new Quaternion(Vector3.X, -13)).mul(new Quaternion(Vector3.Z, -2.8f)));
+	//	computerscreenframe.setToRotation(new Quaternion(Vector3.Z, 45));
+		
+	// -21,154,132	
+	// Z is the rotation to line up with the skewed monitor.	
+		
+		GWTishModelManagement.addmodel(computerscreenframe);	
+		
+		
+		
+		
+		
+		
 		//now we add simple interactions:
 		//
 		//Newspaper click
@@ -206,11 +223,13 @@ public class DemoScene {
 		Label MonthLab = new Label("Oct");
 
 		DayLab.getStyle().setFontSize(4, Unit.PX);
-		MonthLab.getStyle().setFontSize(2.5, Unit.PX);	
 		DayLab.getStyle().setColor(Color.RED);
-
 		DayLab.getStyle().setShadowX(0.20f);
 		DayLab.getStyle().setShadowY(0.20f);
+		
+		MonthLab.getStyle().setShadowX(0.20f);
+		MonthLab.getStyle().setShadowY(0.20f);	
+		MonthLab.getStyle().setFontSize(2.5, Unit.PX);	
 		MonthLab.getStyle().setShadowColor(new Color(0, 0, 0, 0.5f));
 
 		VerticalPanel calfram =  new VerticalPanel();
@@ -341,6 +360,7 @@ public class DemoScene {
 		Label whiteboardtext = new Label("Question: \n Do we really need four walls to save us from the outside void? \n \n Also: \n The Void, friend or friendlier?",200);
 		whiteboardtext.getStyle().setColor(Color.BLACK);
 		whiteboardtext.getStyle().setFontSize(6, Unit.PX);
+	
 		whiteboardtext.getStyle().setShadowY(0.1f);
 		whiteboardtext.getStyle().setShadowX(0.1f);
 		
@@ -358,14 +378,42 @@ public class DemoScene {
 		
 		VerticalPanel computerscreenframe = new VerticalPanel();
 		
-		Label computerscreentext = new Label("_",50);
-		computerscreentext.getStyle().setColor(Color.BLACK);
-		computerscreentext.getStyle().setFontSize(6, Unit.PX);
+		Label computerscreentext = new Label("_locked by ADMIN for your safety, and theirs!",35);
+		computerscreentext.getStyle().setColor(Color.CYAN);
+		computerscreentext.getStyle().setFontSize(3, Unit.PX);
+		computerscreentext.getStyle().setShadowColor(Color.CYAN);
 		computerscreentext.getStyle().setShadowY(0.1f);
 		computerscreentext.getStyle().setShadowX(0.1f);
+		computerscreentext.getStyle().setTextGlowColor(Color.CYAN);
+		
+		
+		// CSS animation magic
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.0f, 0.1f);
+		//computerscreentext.getStyle().addTransitionState(StyleParam.shadowYDisplacement, 0.0f, 0.1f);
+		
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.49f, 0.1f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.5f, 4f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.51f, 0.1f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.60f, 4f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.61f, 0.1f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.62f, 4f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.63f, 0.1f);
+		
+	//	computerscreentext.getStyle().addTransitionState(StyleParam.shadowYDisplacement, 0.5f, 4f);
+		
+
+		computerscreentext.getStyle().setTransitionLength(10000.0f);
+		
+		
+		computerscreenframe.setWidth(50);
+		computerscreenframe.setHeight(50);
+		computerscreenframe.setPadding(2);
+		
 		
 		// style for positioning
-		computerscreenframe.getStyle().setBackgroundColor(Color.CYAN);
+	//	computerscreenframe.getStyle().setBackgroundColor(Color.CYAN);
+		computerscreenframe.getStyle().setBorderWidth(0);
+	//	computerscreenframe.getStyle().setBorderColor((new Color(0, 0, 0, 0)));
 		
 		computerscreenframe.add(computerscreentext);
 		return computerscreenframe;

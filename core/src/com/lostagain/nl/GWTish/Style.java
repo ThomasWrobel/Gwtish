@@ -963,6 +963,8 @@ public class Style {
 	//---------------
 	//animation stuff
 
+//	TODO: COMMENT TOM
+	
 	public void addTransitionState(StyleParam type, float time, Color value) {
 		styleAttribute.addTransitionState(type, time, value);
 		
