@@ -43,13 +43,13 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 
 	/** list of things attached to this object. These things will all move and rotate with it **/
 	HashMap<IsAnimatableModelInstance,PosRotScale> attachlist = new HashMap<IsAnimatableModelInstance,PosRotScale>();
-	
+
 	/** What THIS object is attached too, if anything **/
 	private IsAnimatableModelInstance parentObject = null;
-	
-	
-	
-	
+
+
+
+
 	//how the parent object (if any) effects this one;
 	/** Determines if the position is inherited **/
 	//in future we can have x/y/z separate for more advanced behaviors
@@ -65,7 +65,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	 * If its bull, it needs to be created again which any call like getWidth() will do automatically.
 	 */
 	private BoundingBox localBoundingBox;
-	
+
 	/**
 	 * The collision box is the bounding box multiplied by its current transform.
 	 * So, effectively, its the real boundary's the object currently has in the co-ordinate system of
@@ -74,14 +74,14 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	 * collisionBox.mul(super.getMatrixTransform());
 	 **/
 	private BoundingBox collisionBox;
-	
+
 	/**
 	 * Determines if we inherit visibility from parent.
 	 * NOTE: If inheriting both the parents visibility AND the local visibility have to be set to true for this object to render
 	 * @param model
 	 */
 	public boolean inheritVisibility = true;
-	
+
 	/**
 	 * Determines if we should render this icon or not.
 	 * 
@@ -90,8 +90,8 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	 * @param model
 	 */	
 	public boolean localVisibility = true;
-	
-	
+
+
 	/**
 	 * If this object should be added to the hitable list
 	 */
@@ -99,7 +99,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 
 	/** Necessary as part of hit detection **/
 	private float lastHitDistance; 
-	
+
 	// this is just an example constructor, make sure to implement the constructor you need
 	public AnimatableModelInstance (Model model) {
 		super(model);
@@ -126,7 +126,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	 */
 	@Override
 	public void inheritTransform ( PosRotScale newState) {
-		
+
 		if (inheritedPosition){
 			transState.position.set(newState.position);
 		}
@@ -134,13 +134,13 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 			transState.rotation.set(newState.rotation);
 		}
 		if (inheritedScale){
-			
+
 			//transState.scale.set(newState.scale);
 			setToscale(newState.scale,false);
-			
-			
+
+
 		}
-		
+
 		sycnTransform();
 	}
 
@@ -150,7 +150,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	@Override
 	public void sycnTransform() {
 		super.transform.set(transState.position, transState.rotation, transState.scale);
-		
+
 		//now we check if there's a collision box to update
 		if (collisionBox!=null){
 			recalculateCollisionBox();
@@ -176,7 +176,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		transState.rotation.set(angle);
 		sycnTransform();
 	}
-	
+
 	/**
 	 * Sets the transform of this meshobject to a certain scale
 	 * It will also scale all things attached to this, if they have been set to inherit the scale, 
@@ -192,17 +192,17 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	//this is so internal methods like inheritTransform can call setToScale without wastefully sycning
 	//when they are about to do that anyway.
 	private void setToscale(Vector3 scale,boolean sycn) {		
-		
+
 		transState.scale.set(scale);
-						
+
 		//if we have had our scale change we need to also scale our attachment points position
 		//this is so they stayed pinned to the same place
 		//for (AnimatableModelInstance object : attachlist.keySet()) {
-			
+
 		//	PosRotScale displacement = attachlist.get(object);
 		//	displacement.position.scl(scale);
 		//	updateAtachment(object, displacement);
-			
+
 		//}
 		if (sycn){
 			sycnTransform();
@@ -216,22 +216,22 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	public Matrix4 getMatrixTransform() {		
 		return super.transform;
 	}
-	
+
 	public void hide(){	
 		hide(true);
 	}	
 
-	
+
 	public void hide(boolean setlocalVisibility){		
 		currentRenderPlacement = GWTishModelManagement.removeModel(this);	
-		
+
 		if (setlocalVisibility){
 			localVisibility = false;
 		}
-		
+
 		//ensure its not on the hitable list
 		GWTishModelManagement.removeHitable(this);
-				
+
 		//we also hide things positioned relatively to this. Nothing overrides this
 		for (IsAnimatableModelInstance object : attachlist.keySet()) {
 			if (object.isInheriteingVisibility()){
@@ -239,25 +239,32 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 			}
 		}
 	}
-	
+
 	public void show(){	
 		show(true);
 	}
-	
-	
+
+
 	public void show(boolean setlocalVisibility){		
-		
-		GWTishModelManagement.addmodel(this,currentRenderPlacement);
-		
-		if (Hitable){
-			GWTishModelManagement.addHitable(this);
+
+		//if we are not inheritVisibility, or our parent is visible
+		if (!inheritVisibility
+				|| (getParentObject()!=null && this.getParentObject().isVisible())){
+
+			GWTishModelManagement.addmodel(this,currentRenderPlacement);
+
+			if (Hitable){
+				GWTishModelManagement.addHitable(this);
+			}
+
+
 		}
-		
-		
+
+
 		if (setlocalVisibility){
 			localVisibility = true;
 		}
-		
+
 		//we also show things positioned relatively to this unless they have visible false set
 		for (IsAnimatableModelInstance object : attachlist.keySet()) {
 			if (object.isInheriteingVisibility()  && object.isVisible() ){
@@ -266,7 +273,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		}
 	}
 
-	
+
 	/**
 	 * returns scaled width
 	 */
@@ -274,7 +281,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	public float getScaledWidth(){		
 		return this.getWidth()*this.transState.scale.x;
 	}
-	
+
 	/**
 	 * returns scaled height
 	 */
@@ -305,21 +312,21 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		}
 		return localBoundingBox.getHeight();
 	}
-	
+
 	/**
 	 * the position of the pivot relative to the bounding box center
 	 * @return
 	 */
 	public Vector3 getPivotsDisplacementFromCenterOfBoundingBox(){
-		
+
 		Vector3 centerOnStage =  getCenterOnStage();
 		Vector3 currentPos = this.getTransform().position;
-		
+
 		return centerOnStage.sub(currentPos);
-		
+
 	}
-	
-	
+
+
 	/**
 	 * = getCenterOfBoundingBox() * position matrix
 	 * @return
@@ -327,14 +334,14 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	public Vector3 getCenterOnStage(){
 		return getCenterOfBoundingBox().mul(getMatrixTransform());
 	}
-	
+
 	/**
 	 * Note; Gets the center position of the bounding box if it was scaled but not positioned, you need to multiply by the position to get the center on the stage
 	 */
 	public Vector3 getCenterOfBoundingBoxScaled(){
 		return getCenterOfBoundingBox().scl(getTransform().scale);
 	}
-	
+
 	/**
 	 * Note; Gets the center position of the bounding box if it was unscaled, you need to multiply by the position to get the center on the stage
 	 */
@@ -346,45 +353,45 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		Vector3 center = new Vector3();
 		return localBoundingBox.getCenter(center);
 	}
-	
+
 	/**
 	 * The bounding box of this object if it was not scaled
 	 */
 	private void createBoundBox() {
-		
+
 		localBoundingBox = new BoundingBox();
-		
-		 super.calculateBoundingBox(localBoundingBox);
-		 	
+
+		super.calculateBoundingBox(localBoundingBox);
+
 	}
-	
+
 
 	private void recalculateCollisionBox() {
-		
+
 		//the bounding box is a prerequisite
 		if (localBoundingBox==null){
 			createBoundBox();
-			
+
 		}
 		//so is an existing collisionBox
 		if (collisionBox==null){
 			collisionBox = new BoundingBox();
-			
+
 		}
 		//ok, now we know we have both we set one to the other
 		collisionBox.set(localBoundingBox);
-		
+
 		//Then the collision box gets multiplied by our current position so its boundary's match the real space co-ordinates
 		collisionBox.mul(getMatrixTransform());
 
 		//Gdx.app.log(logstag,"collision box matrix="+getMatrixTransform());
 		//Gdx.app.log(logstag,"collision box="       +collisionBox);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.lostagain.nl.me.newmovements.IsAnimatableModelInstance#getLocalCollisionBox()
 	 */
-	
+
 	/**
 	 * 
 	 * @param onceOnly - indicate that you dont want the collision box to auto-update when this object is moved
@@ -392,19 +399,19 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	 */
 	@Override
 	public BoundingBox getLocalCollisionBox(boolean onceOnly) {
-		
+
 		if (collisionBox==null){
 			recalculateCollisionBox();
 		}
 		BoundingBox collisionBoxTemp = collisionBox;
-		
+
 		if (onceOnly){
 			collisionBox=null; //clear so we dont update again
 		}
-		
+
 		return collisionBoxTemp;
 	}
-	
+
 	@Override
 	public BoundingBox getLocalCollisionBox() {
 		return getLocalCollisionBox(false); 
@@ -414,8 +421,8 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		}
 		return collisionBox;*/
 	}
-	
-	
+
+
 	/* (non-Javadoc)
 	 * @see com.lostagain.nl.me.newmovements.IsAnimatableModelInstance#getLocalBoundingBox()
 	 */
@@ -426,7 +433,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		}
 		return localBoundingBox;
 	}
-	
+
 	/**
 	 * should not really need to be public only temp while testing things to ensure it isn't the bounding box being inaccurate
 	 */
@@ -437,7 +444,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		if (collisionBox!=null){
 			recalculateCollisionBox();
 		}
-		
+
 	}
 	/* (non-Javadoc)
 	 * @see com.lostagain.nl.me.newmovements.IsAnimatableModelInstance#attachThis(com.lostagain.nl.me.newmovements.AnimatableModelInstance, com.lostagain.nl.me.newmovements.PosRotScale)
@@ -451,59 +458,59 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		if (!attachlist.containsKey(objectToAttach))
 		{
 			attachlist.put(objectToAttach, displacement);
-			
+
 			//associate this as the parent object
 			//objectToAttach.parentObject=this;
 			objectToAttach.setParentObject(this);
-			
+
 			//give it a initial update
 			updateAttachedObject(objectToAttach);
-			
+
 			//PosRotScale newposition = transState.copy().displaceBy(displacement); //attachlist.get(objectToAttach)
 			//objectToAttach.inheritTransform(newposition);
-			
-			
+
+
 		} else {
 			Gdx.app.log(logstag,"_____________________________________already attached so repositioning to new displacement"); 
 			this.updateAtachment(objectToAttach, displacement);
-			
+
 			//give it a initial update
 			updateAttachedObject(objectToAttach);
-			
+
 			//PosRotScale newposition = transState.copy().displaceBy(displacement);
 			//objectToAttach.inheritTransform(newposition);
-			
+
 		}
 
 		//	Gdx.app.log(logstag,"_____________________________________total objects now: "+attachlist.size()); 
 
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.lostagain.nl.me.newmovements.IsAnimatableModelInstance#removeAttachment(com.lostagain.nl.me.newmovements.AnimatableModelInstance)
 	 */
 	@Override
 	public void removeAttachment(IsAnimatableModelInstance objectToRemove){
-		
+
 		if (attachlist.containsKey(objectToRemove))
 		{
 			attachlist.remove(objectToRemove);
 			//remove this as the parent object
 			//objectToRemove.parentObject=null;
 			objectToRemove.setParentObject(null);
-			
+
 		}
-		
-		
+
+
 	}
-	
+
 	private void updateAttachedObject(IsAnimatableModelInstance objectToUpdate){
 
 		PosRotScale displacement = attachlist.get(objectToUpdate).copy();			
 		displacement.position = displacement.position.scl(transState.scale); //displacement needs to be scaled			
 		PosRotScale newposition = transState.copy().displaceBy(displacement);
-		
-		
+
+
 		objectToUpdate.inheritTransform(newposition);
 	}
 
@@ -513,12 +520,12 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 
 		for (IsAnimatableModelInstance object : attachlist.keySet()) {
 
-			
+
 			updateAttachedObject(object);
-			
-			
+
+
 		}
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -530,19 +537,19 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 
 		attachlist.put(object, displacement);
 		updateAttachedObject(object);
-		
+
 
 	}
-	
+
 	public PosRotScale getAttachmentsPoint(AnimatableModelInstance object){
 		return attachlist.get(object);
 	}
 
 
 
-	
-	
-	
+
+
+
 	/* (non-Javadoc)
 	 * @see com.lostagain.nl.me.newmovements.IsAnimatableModelInstance#lookAt(com.lostagain.nl.me.newmovements.AnimatableModelInstance)
 	 */
@@ -560,7 +567,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		Quaternion angle = getAngleTo(target,Axis);			
 		setToRotation(angle);			
 	}
-	
+
 	@Override
 	public void lookAt(Vector3 target, Vector3 Axis){			
 		Quaternion angle = getAngleTo(target,Axis);			
@@ -580,16 +587,16 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	@Override
 	public Quaternion getAngleTo(IsAnimatableModelInstance target, Vector3 Axis) {
 		return getAngleTo(target.getTransform().position, Axis);
-	//	return getAngleTo(target.transState.position, Axis);
+		//	return getAngleTo(target.transState.position, Axis);
 	}
-	
+
 	@Override
 	public Quaternion getAngleTo(Vector3 target, Vector3 Axis) {
 
 		Vector3 thisPoint   = this.transState.position.cpy();
 		//Vector3 targetPoint = target.transState.position.cpy();
 		Vector3 targetPoint = target.cpy();
-				
+
 		//get difference (which is the same as target relative to 0,0,0 if this point was 0,0,0)
 		targetPoint.sub(thisPoint);			
 		targetPoint.nor();
@@ -620,30 +627,30 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 
 		return attachlist.keySet();
 	}
-	
-	
+
+
 	/**
 	 * gets all attachments and child attachments
 	 */
 	@Override
 	public Set<IsAnimatableModelInstance> getAllAttachments() {
-		
+
 		Set<IsAnimatableModelInstance> attachments = new HashSet();
 		Set<IsAnimatableModelInstance> direct_children = new HashSet<IsAnimatableModelInstance>(attachlist.keySet());
-		
+
 		attachments.addAll(direct_children);
-		
+
 		for (IsAnimatableModelInstance childAttach : direct_children) {
-			
+
 			attachments.addAll(childAttach.getAllAttachments());
-			
+
 		}				
-		
-		
+
+
 		return attachments;
 	}
-	
-	
+
+
 
 	/* (non-Javadoc)
 	 * @see com.lostagain.nl.me.newmovements.IsAnimatableModelInstance#setInheritedPosition(boolean)
@@ -678,25 +685,25 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	@Override
 	public void setInheritedVisibility(boolean inheritVisibility) {
 		this.inheritVisibility = inheritVisibility;
-		
+
 		//update our visibility
 		//if our local visibility is false we just ensure we are hidden, nothing else to change
 		if (localVisibility==false){
 			this.hide(false);
-			
-			
+
+
 			return;
 		} else {
-		//if our local visibility is true then we base it on the parent setting
-			if (this.getParentObject().isVisible()){
+			//if our local visibility is true then we base it on the parent setting
+			if (getParentObject()!=null && this.getParentObject().isVisible()){
 				this.show(false); //NOTE the false, this is used so we dont disturb the local visibility setting
 			} else {
 				this.hide(false);
 			}
-			
-			
+
+
 		}
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -709,15 +716,15 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 
 	@Override
 	public boolean isVisible() {
-		
+
 		//if local visibility is false, or we are not inheriting the visibility, then our localvisibility should match are visibility
 		if (getParentObject()==null || localVisibility==false || !inheritVisibility ){
 			return localVisibility;
 		}
-		
+
 		///if we are inheriting and we are not hidden then our visibility should match our parents
 		return getParentObject().isVisible();
-				
+
 	}
 
 	/**
@@ -725,15 +732,15 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	 * @return
 	 */
 	public boolean isOverlay() {
-	
+
 		if (currentRenderPlacement == RenderOrder.OVERLAY){
 			return true;
 		} else {
 			return false;
 		}
-	
+
 	}
-	
+
 	/**
 	 * Adds it to the hitable list. This is a list of things designed to be clicked on or shot at.
 	 * ie. Fires events when a ray hits.
@@ -745,7 +752,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	 */
 	public void setAsHitable(boolean hitable){
 		this.Hitable = hitable;
-		
+
 		if (Hitable){
 			if (isVisible()){
 				GWTishModelManagement.addHitable(this);
@@ -753,8 +760,8 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		} else {
 			GWTishModelManagement.removeHitable(this);
 		}
-		
-		
+
+
 	}
 
 	@Override
@@ -764,27 +771,27 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 
 	@Override
 	public void fireTouchDown() {
-		
+
 	}
 
 	@Override
 	public void fireTouchUp() {
-		
+
 	}
 	@Override
 	public void fireClick() {
-		
+
 	}
 	@Override
 	public void fireDragStart() {
-		
+
 	}
 
 	//The following two just keep track of where this hit was in the stack of hits for a given ray
 	@Override
 	public void setLastHitsRange(float range) {
 		lastHitDistance = range;
-		
+
 	}
 
 	@Override
@@ -815,8 +822,8 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	public Vector3 rayHits(Ray ray) {
 		//boolean hit = Intersector.intersectRayBoundsFast(ray, this.getLocalCollisionBox());
 		//Gdx.app.log(logstag,"testing for hit on object:"+hit);
-		
-		
+
+
 		//new more precise distance test
 		Vector3 intersection = new Vector3();
 		boolean hit = Intersector.intersectRayBounds(ray, this.getLocalCollisionBox(), intersection);
@@ -828,19 +835,19 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	}
 
 	protected boolean isHitable() {
-		
+
 		return GWTishModelManagement.hitables.contains(this);
-		
+
 	}
 
-	
+
 	public boolean hasAttachment(AnimatableModelInstance object) {
 		return attachlist.containsKey(object);
 	}
 
 
 	public void setAsOverlay(boolean status){
-		
+
 		if (status){
 			currentRenderPlacement = RenderOrder.OVERLAY;
 			GWTishModelManagement.setAsOverlay(this);			
@@ -848,7 +855,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 			currentRenderPlacement = RenderOrder.STANDARD;
 			GWTishModelManagement.setAsStandard(this);			
 		}
-		
+
 	}
 
 	/**
@@ -885,6 +892,6 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		return "AnimatedModalInstance";
 	}
 
-	
+
 
 }

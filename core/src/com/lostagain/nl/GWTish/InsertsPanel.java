@@ -276,6 +276,7 @@ public class InsertsPanel extends FlowPanel {
 		 if (existing==null){
 			 //if none supplied use default label type
 			 existing = getDefaultLabelType(contents);
+		
 		 } else {
 			 //else set what was given
 			 if (addToExisting){
@@ -286,10 +287,12 @@ public class InsertsPanel extends FlowPanel {
 			
 		 }
 		 
+		 
 			//now store the insert points as named points (if there was any)
 		 if (inserts.size()>0){
 			allKnowenInsertPoints.put(existing, inserts);
 		 }
+		existing.setInheritedVisibility(true);
 		
 		return existing;
 	}
@@ -500,6 +503,7 @@ public class InsertsPanel extends FlowPanel {
 					}
 
 					prepareWidgetToInsertsZIndex(newwidget); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
+					newwidget.setInheritedVisibility(true);
 					contents.add(index,newwidget); //inserts it before
 					
 					Label beforelab = null;
