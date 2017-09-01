@@ -27,6 +27,7 @@ import com.lostagain.nl.GWTish.Style.Unit;
  * makes a demo scene to show how  Labels, widgets for layour, and interaction works. 
  * 
  * @author darkflame
+ * @author atresica
  *
  */
 public class DemoScene {
