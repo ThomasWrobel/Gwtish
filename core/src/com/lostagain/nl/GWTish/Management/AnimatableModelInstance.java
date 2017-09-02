@@ -136,7 +136,7 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 		if (inheritedScale){
 
 			//transState.scale.set(newState.scale);
-			setToscale(newState.scale,false);
+			setToScale(newState.scale,false);
 
 
 		}
@@ -185,13 +185,13 @@ public class AnimatableModelInstance extends ModelInstance implements IsAnimatab
 	 **/
 	@Override
 	public void setToScale(Vector3 scale) {	
-		setToscale(scale,true);
+		setToScale(scale,true);
 	}
 
 	//we have a separate method with the option to not sycn
 	//this is so internal methods like inheritTransform can call setToScale without wastefully sycning
 	//when they are about to do that anyway.
-	private void setToscale(Vector3 scale,boolean sycn) {		
+	private void setToScale(Vector3 scale,boolean sycn) {		
 
 		transState.scale.set(scale);
 

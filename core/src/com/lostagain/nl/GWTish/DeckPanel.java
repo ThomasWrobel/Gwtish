@@ -25,10 +25,15 @@ public class DeckPanel extends ComplexPanel {
 	final static String logstag = "GWTish.DeckPanel";
 	public static Logger Log = Logger.getLogger(logstag); //not we are using this rather then gdxs to allow level control per tag
 
-	
+
+	/**
+	 * assumes 1x1 size, should expand as needed
+	 */
+	public DeckPanel() {
+		super(1,1);
+	}
 	public DeckPanel(float sizeX, float sizeY) {
 		super(sizeX, sizeY);
-		// TODO Auto-generated constructor stub
 	}
 
 	//@Override

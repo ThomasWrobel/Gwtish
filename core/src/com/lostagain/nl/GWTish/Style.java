@@ -962,22 +962,44 @@ public class Style {
 
 	//---------------
 	//animation stuff
-
+	/**
+	 * Note: At least two transition states at different times should be specified for a transtion to work.
+	 * 
+	 * @param type   - the type of style we are setting at this time
+	 * @param time   - a value between 0.0 and 1.0 that represents how far into the animation this state should be
+	 * @param value  - the new value for the type ofstyle   eg new Color(1.0,0,0,0.5) for red at 0.5 opacity 
+	 */
 	public void addTransitionState(StyleParam type, float time, Color value) {
 		styleAttribute.addTransitionState(type, time, value);
 		
 	}
+	
+	/**
+	 * Note: At least two transition states at different times should be specified for a transtion to work.
+	 * 
+	 * @param type   - the type of style we are setting at this time
+	 * @param time   - a value between 0.0 and 1.0 that represents how far into the animation this state should be
+	 * @param value  - the new value for the type ofstyle   
+	 */
 	public void addTransitionState(StyleParam type, float time, float value) {
 		styleAttribute.addTransitionState(type, time, value);		
 	}
+	/**
+	 * Note: At least two transition states at different times should be specified for a transtion to work.
+	 * 
+	 * @param type   - the type of style we are setting at this time
+	 * @param time   - a value between 0.0 and 1.0 that represents how far into the animation this state should be
+	 * @param value  - the new value for the type ofstyle 
+	 */
 	public void addTransitionState(StyleParam type, float time, Vector3 value) {
 		styleAttribute.addTransitionState(type, time, value);		
 	}
 	/**
+	 * Note: At least two transition states at different times should be specified for a transtion to work.
 	 * 
-	 * @param type
-	 * @param time
-	 * @param value    eg new Quaternion(Vector3.Z,45) for 45deg
+	 * @param type   - the type of style we are setting at this time
+	 * @param time   - a value between 0.0 and 1.0 that represents how far into the animation this state should be
+	 * @param value  - the new value for the type ofstyle   eg new Quaternion(Vector3.Z,45) for 45deg
 	 */
 	public void addTransitionState(StyleParam type, float time, Quaternion value) {
 		styleAttribute.addTransitionState(type, time, value);		

@@ -482,10 +482,24 @@ public abstract class ComplexPanel extends Widget {
 		return true;
 	}
 
-	
-	//protected void internalAdd(Widget widget) {
-//		internalAdd(widget,true);
-//	}
+	public Widget getWidget(int index) {
+		return contents.get(index);
+	}
+/**
+ * 
+ * @param  child - the widget to be found
+ * @return the widget's index, or -1 if it is not a child of this panel
+ */
+	public int getWidgetIndex(Widget child) {
+		 for (int i = 0; i < contents.size(); i++) {
+			Widget array_element = contents.get(i);
+			if (array_element==child){
+				return i;
+			}
+			
+		} 
+		return -1;
+	}
 	
 	/**
 	 * Attaches the widget at the end of the current ones without resizing or adding to lists
