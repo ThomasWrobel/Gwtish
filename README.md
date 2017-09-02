@@ -4,6 +4,14 @@ Makes it easy to add streetsigns, readable newspapers or even interactive comput
 
 ![gwtish2](https://user-images.githubusercontent.com/10658173/29994850-47d93010-8fda-11e7-9226-30c7c92f7817.jpg)
 
+Try the DemoScene:
+JAR:
+http://darkflame.co.uk/JAMGames/GwtishDemoScene/GwtishDemoScene.jar
+HTML:
+http://darkflame.co.uk/JAMGames/GwtishDemoScene/html/index.html
+Android:
+(pending...)
+
 ## **Whos it for?**
 - LibGDX users working on 3D games or apps
 - GWT users looking to make 3D games using a familiar syntax to what they are used too
