@@ -6,11 +6,9 @@ Makes it easy to add streetsigns, readable newspapers or even interactive comput
 
 Try the DemoScene:
 
-JAR:
-[GwtishDemoScene.jar](http://darkflame.co.uk/JAMGames/GwtishDemoScene/GwtishDemoScene.jar)
-HTML:
-[index.html](http://darkflame.co.uk/JAMGames/GwtishDemoScene/html/index.html)
-Android:
+  JAR:  [GwtishDemoScene.jar](http://darkflame.co.uk/JAMGames/GwtishDemoScene/GwtishDemoScene.jar)
+  HTML:  [index.html](http://darkflame.co.uk/JAMGames/GwtishDemoScene/html/index.html)
+  Android:
 (pending...)
 
 ## **Whos it for?**
