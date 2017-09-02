@@ -8,8 +8,8 @@ Try the DemoScene:
 
   JAR:  [GwtishDemoScene.jar](http://darkflame.co.uk/JAMGames/GwtishDemoScene/GwtishDemoScene.jar)
   HTML:  [index.html](http://darkflame.co.uk/JAMGames/GwtishDemoScene/html/index.html)
-  Android:
-(pending...)
+  Android: [GwtishDemoScene.apk](http://darkflame.co.uk/JAMGames/GwtishDemoScene/GwtishDemoScene.apk)
+(Android not tested...)
 
 ## **Whos it for?**
 - LibGDX users working on 3D games or apps
