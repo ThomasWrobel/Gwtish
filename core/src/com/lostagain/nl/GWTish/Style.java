@@ -962,6 +962,7 @@ public class Style {
 
 	//---------------
 	//animation stuff
+<<<<<<< HEAD
 	/**
 	 * Note: At least two transition states at different times should be specified for a transtion to work.
 	 * 
@@ -969,6 +970,11 @@ public class Style {
 	 * @param time   - a value between 0.0 and 1.0 that represents how far into the animation this state should be
 	 * @param value  - the new value for the type ofstyle   eg new Color(1.0,0,0,0.5) for red at 0.5 opacity 
 	 */
+=======
+
+//	TODO: COMMENT TOM
+	
+>>>>>>> 0e29218eebcd6525de8a70581c0587541a333f1d
 	public void addTransitionState(StyleParam type, float time, Color value) {
 		styleAttribute.addTransitionState(type, time, value);
 		
