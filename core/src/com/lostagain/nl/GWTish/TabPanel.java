@@ -13,8 +13,6 @@ public class TabPanel extends VerticalPanel{
 
 
 	/**
-	 * This extension of HorizontalPanel overrides the public mutator methods to prevent
-	 * external callers from modifying the state of the TabBar.
 	 */
 	private class UnmodifiableTabBar extends HorizontalPanel {
 		TabPanel associatedtabpanel;
@@ -24,26 +22,31 @@ public class TabPanel extends VerticalPanel{
 		}
 		
 
-		public void selectTab(int index, boolean fireEvents) {
+		public void selectTabVisually(int index, boolean fireEvents) {
 			// TODO Auto-generated method stub
 
 		}
 
 	}
 
+	
+	
 
 	DeckPanel panel = new DeckPanel();
 
 	private UnmodifiableTabBar tabbar = new UnmodifiableTabBar(this);
 
+	private int currentlySelected;
+
 	public TabPanel() {
 		super();
 
-		this.add(tabbar,panel);
-
-		this.getStyle().setBackgroundColor(Color.BLUE);
-		tabbar.getStyle().setBackgroundColor(Color.RED);
-		panel.getStyle().setBackgroundColor(Color.CORAL);
+		super.add(tabbar,panel);
+		
+		this.getStyle().setBorderColor(Color.WHITE);
+		tabbar.getStyle().setBorderColor(Color.RED);
+		panel.getStyle().setBorderColor(Color.CORAL);
+		
 	}
 
 
@@ -56,7 +59,7 @@ public class TabPanel extends VerticalPanel{
 
 
 	/**
-	 * Adds a widget to the tab panel. If the Widget is already attached to the
+	 * Adds a widget to the tab panel. TODO:If the Widget is already attached to the
 	 * TabPanel, it will be moved to the right-most index.
 	 *
 	 * @param w the widget to be added
@@ -115,7 +118,7 @@ public class TabPanel extends VerticalPanel{
 
 	/**
 	 * Gets the tab bar within this tab panel. Adding or removing tabs from the
-	 * TabBar is not supported and will throw UnsupportedOperationExceptions.
+	 * TabBar is not supported 
 	 *
 	 * @return the tab bar
 	 */
@@ -141,7 +144,7 @@ public class TabPanel extends VerticalPanel{
 
 
 	/**
-	 * Inserts a widget into the tab panel. If the Widget is already attached to
+	 * Inserts a widget into the tab panel. TODO:If the Widget is already attached to
 	 * the TabPanel, it will be moved to the requested index.
 	 *
 	 * @param widget the widget to be inserted
@@ -149,11 +152,11 @@ public class TabPanel extends VerticalPanel{
 	 * @param beforeIndex the index before which it will be inserted
 	 */
 	public void insert(Widget widget, String tabText, int beforeIndex) {
-		insert(widget, tabText, beforeIndex);
+		insert(widget,new Label( tabText), beforeIndex);
 	}
 
 	/**
-	 * Inserts a widget into the tab panel. If the Widget is already attached to
+	 * Inserts a widget into the tab panel. TODO:If the Widget is already attached to
 	 * the TabPanel, it will be moved to the requested index.
 	 *
 	 * @param widget the widget to be inserted.
@@ -163,7 +166,8 @@ public class TabPanel extends VerticalPanel{
 	public void insert(final Widget widget, Widget tabWidget, int beforeIndex) {
 
 		//add tab
-		tabbar.add(tabWidget);
+		tabbar.insert(tabWidget, beforeIndex);
+	
 		tabWidget.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick() {
@@ -175,7 +179,11 @@ public class TabPanel extends VerticalPanel{
 
 		//add new widget to deck
 		panel.insert(widget, beforeIndex);
+		
+		//ensure hidden? reselect current tab
+		this.selectTab(currentlySelected, false);
 	}
+	
 
 	//
 	//	  @Override
@@ -187,8 +195,7 @@ public class TabPanel extends VerticalPanel{
 
 
 	public boolean remove(int index) {
-		// Delegate updates to the TabBar to our DeckPanel implementation
-
+		
 		Widget widget_at_index = panel.getWidget(index);
 		boolean removedFromDeck =  panel.remove(widget_at_index);
 
@@ -236,9 +243,11 @@ public class TabPanel extends VerticalPanel{
 	 * @param fireEvents true to fire events, false not to (selection events not yet implemented)
 	 */
 	public void selectTab(int index, boolean fireEvents) {
-		tabbar.selectTab(index, fireEvents);
+		tabbar.selectTabVisually(index, fireEvents);
 		panel.showWidget(index, true);
-
+		currentlySelected = index;
+		
+		
 	}
 
 

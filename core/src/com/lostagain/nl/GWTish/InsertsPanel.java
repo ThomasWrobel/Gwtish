@@ -783,7 +783,7 @@ public class InsertsPanel extends FlowPanel {
 		NewLinePlacer testnewline = new NewLinePlacer(debugMode);
 		//testnewline.setMinSize(15, 15); //to help tests make it visible
 	//	testnewline.getStyle().setBackgroundColor(Color.RED);
-		int index=contents.indexOf(lab)+1; //location of current label to replace
+		int index=contents.indexOf(lab); //location of current label to replace // removed+1
 
 
 		if (!after.isEmpty()){ 						//we dont make empty labels
@@ -900,7 +900,7 @@ public class InsertsPanel extends FlowPanel {
 					Log.info(before+"[widget]"+after);
 
 
-					int index=contents.indexOf(lab)+1; //location of current label to replace
+					int index=contents.indexOf(lab); //location of current label to replace  // removed+1
 
 					Log.info("[index]"+index);
 					Label afterlab = null;

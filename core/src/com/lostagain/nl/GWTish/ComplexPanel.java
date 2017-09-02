@@ -386,7 +386,7 @@ public abstract class ComplexPanel extends Widget {
 		
 	
 		
-		return insert(widget,contents.size()+1);
+		return insert(widget,contents.size()); // removed+1
 		
 	}
 	
@@ -405,7 +405,7 @@ public abstract class ComplexPanel extends Widget {
 		prepareWidgetToInsertsZIndex(widget);
 		
 		//------------
-		int atIndex = beforeIndex-1;
+		int atIndex = beforeIndex; // removed -1
 		
 		if (contents.contains(widget)){
 			Log.info("______________already contains widget");
