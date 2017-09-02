@@ -32,8 +32,6 @@ import com.lostagain.nl.GWTish.Style.Unit;
  */
 public class DemoScene {
 
-//	static Model wallmodel;
-//	static ModelInstance wallInstance;
 	public static FirstPersonCameraController fpscontrols;
 	
 
@@ -60,7 +58,7 @@ public class DemoScene {
 		DemoScene.assetsmanager=assetsmanager;
 		//set all "background" models loading
 
-		//Walls etc;
+		//Walls etc:
 		assetsmanager.load("walls.g3db", Model.class);
 		assetsmanager.load("floor.g3db", Model.class);
 		assetsmanager.load("roof_reflect.g3db", Model.class);
@@ -78,14 +76,6 @@ public class DemoScene {
 
 		assetsmanager.load("cal.g3db", Model.class);
 	}
-	/*
-	 * ideas:
-	 * Newspaper head changes when clicked to "man clicks headline!" "doesnt understand media"
-	 * Maybe small article "Small text not lorem ipsum shock!"
-	 * 
-	 * what on computer? whiteboard?
-	 * Computer probably should demo css-ish animated text effect somewhere.
-	 */
 	
 	/**
 	 * sets up the demo scenes visuals and interactions.
@@ -129,12 +119,9 @@ public class DemoScene {
 		VerticalPanel computerscreenframe = getComputerScreen();
 		// position computer
 		computerscreenframe.setToPosition(new Vector3(-21, 132, -154));
-	//	computerscreenframe.setToRotation(new Quaternion(Vector3.X, 45));
 		computerscreenframe.setToRotation(new Quaternion(Vector3.Y, -47.5f).mul(new Quaternion(Vector3.X, -13)).mul(new Quaternion(Vector3.Z, -2.8f)));
-	//	computerscreenframe.setToRotation(new Quaternion(Vector3.Z, 45));
-		
-	// -21,154,132	
-	// Z is the rotation to line up with the skewed monitor.	
+
+
 		
 		GWTishModelManagement.addmodel(computerscreenframe);	
 		
@@ -170,7 +157,7 @@ public class DemoScene {
 
 
 	private static void setupBackgroundModels() {
-		//Note:Beware of models and draw order, large models will often need to be broken up or their pivots adjusted if the sorting algorthm is justing using pivot distances
+		//Note:Beware of models and draw order, large models will often need to be broken up or their pivots adjusted if the sorting algorithm is justing using pivot distances
 		//
 
 		Model floor = assetsmanager.get("floor.g3db", Model.class);
@@ -215,7 +202,7 @@ public class DemoScene {
 	}
 
 	/**
-	 * creates the text for a desk calander 
+	 * creates the text for a desk calendar 
 	 * @return
 	 */
 	private static VerticalPanel getCal() {
@@ -280,9 +267,9 @@ public class DemoScene {
 
 		//layout
 		dateandprice.add(price,spacer,date);
-		//		dateandprice.setMinWidth(250);
+
 		//dateandprice.setCellHorizontalAlignment(price, HorizontalAlignment.Left); //Sadly hor alignment is not supported yet
-		//dateandprice.setCellHorizontalAlignment(date, HorizontalAlignment.Right);
+
 
 		horizontalFrame.setCellVerticalAlignment(rightPanelFrame, VerticalAlignment.Top);
 
@@ -292,12 +279,10 @@ public class DemoScene {
 		
 		overallFrame.add(dateandprice,headline,subheadline,horizontalFrame);
 		horizontalFrame.add(randomtext1,rightPanelFrame);
-		//	horizontalFrame.setSpaceing(7f);
 		rightPanelFrame.add(npimage,randomtext2);
 		horizontalFrame.setPadding(1f);
 
 		//style
-		//overallFrame.getStyle().setBackgroundColor(Color.WHITE);
 
 		price.getStyle().setColor(Color.BLACK);
 		spacer.getStyle().setColor(Color.BLACK);
@@ -319,7 +304,6 @@ public class DemoScene {
 		price.getStyle().setStyleToMatch(subheadline.getStyle(), false, false);
 		randomtext1.getStyle().setStyleToMatch(subheadline.getStyle(), false, false);
 		randomtext2.getStyle().setStyleToMatch(subheadline.getStyle(), false, false);
-		//randomtext1.getStyle().setStyleToMatch(subheadline.getStyle(), false, false);
 		
 		headline.getStyle().setPaddingRight(3);
 		headline.getStyle().setPaddingLeft(3);
@@ -389,20 +373,16 @@ public class DemoScene {
 		
 		
 		// CSS animation magic
-		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.0f, 0.1f);
-		//computerscreentext.getStyle().addTransitionState(StyleParam.shadowYDisplacement, 0.0f, 0.1f);
 		
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.0f, 0.1f); // You have to start the animation at 0.0f
 		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.49f, 0.1f);
 		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.5f, 4f);
 		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.51f, 0.1f);
 		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.60f, 4f);
 		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.61f, 0.1f);
 		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.62f, 4f);
-		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.63f, 0.1f);
-		
-	//	computerscreentext.getStyle().addTransitionState(StyleParam.shadowYDisplacement, 0.5f, 4f);
-		
-
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.63f, 0.1f); // You won't need to finish the animation all the way, it fills in the rest automatically. Then it loops back unless overridden.
+	
 		computerscreentext.getStyle().setTransitionLength(10000.0f);
 		
 		
@@ -411,10 +391,8 @@ public class DemoScene {
 		computerscreenframe.setPadding(2);
 		
 		
-		// style for positioning
-	//	computerscreenframe.getStyle().setBackgroundColor(Color.CYAN);
+		// clean default border style.
 		computerscreenframe.getStyle().setBorderWidth(0);
-	//	computerscreenframe.getStyle().setBorderColor((new Color(0, 0, 0, 0)));
 		
 		computerscreenframe.add(computerscreentext);
 		return computerscreenframe;
@@ -430,8 +408,6 @@ public class DemoScene {
 	 */
 	static public void setupForDemoScene(Camera cam) {
 		activecam=cam;
-		//Camera cam = Gwtish.cam;
-		//cam = new PerspectiveCamera(67,w,h);
 	
 		cam.position.set(-150f, 150f, 75f); //overhead
 		cam.lookAt(0,150,0);
@@ -441,7 +417,6 @@ public class DemoScene {
 	
 		Gwtish.Log.info("camera setup ");
 		
-		//camController = new CameraInputController(cam);
 		 fpscontrols = new FirstPersonCameraController(cam);
 		 fpscontrols.setVelocity(60f);
 		Gdx.input.setInputProcessor(fpscontrols);
