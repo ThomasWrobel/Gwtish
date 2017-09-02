@@ -1,5 +1,5 @@
 # Gwtish
-A 3D UI,style and interaction library for [libgdx](https://libgdx.badlogicgames.com/)
+A 3D UI, style and interaction library for [libgdx](https://libgdx.badlogicgames.com/)
 Makes it easy to add streetsigns, readable newspapers or even interactive computer terminals to your game.
 
 ![gwtish2](https://user-images.githubusercontent.com/10658173/29994850-47d93010-8fda-11e7-9226-30c7c92f7817.jpg)
