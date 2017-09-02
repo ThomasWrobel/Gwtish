@@ -16,16 +16,37 @@ public class TabPanel extends VerticalPanel{
 	 */
 	private class UnmodifiableTabBar extends HorizontalPanel {
 		TabPanel associatedtabpanel;
+		private int lastSelected=-1;
+		
 		
 		public UnmodifiableTabBar(TabPanel tabPanel) {
 			associatedtabpanel=tabPanel;
 		}
 		
-
+		/**
+		 * selects tab, does not effect dockpanel
+		 * @param index
+		 * @param fireEvents
+		 */
 		public void selectTabVisually(int index, boolean fireEvents) {
-			// TODO Auto-generated method stub
-
+			
+			if (lastSelected!=-1){
+				unSelectTabVisually(lastSelected,fireEvents);
+			}
+			
+			
+			lastSelected =index;
+			
 		}
+
+
+		
+		private void unSelectTabVisually(int lastSelected2, boolean fireEvents) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
 
 	}
 
