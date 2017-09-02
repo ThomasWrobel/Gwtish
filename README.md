@@ -2,6 +2,8 @@
 A 3D UI,style and interaction library for [libgdx](https://libgdx.badlogicgames.com/)
 Makes it easy to add streetsigns, readable newspapers or even interactive computer terminals to your game.
 
+![gwtish2](https://user-images.githubusercontent.com/10658173/29994850-47d93010-8fda-11e7-9226-30c7c92f7817.jpg)
+
 ## **Whos it for?**
 - LibGDX users working on 3D games or apps
 - GWT users looking to make 3D games using a familiar syntax to what they are used too
@@ -54,14 +56,20 @@ Makes it easy to add streetsigns, readable newspapers or even interactive comput
     
 - Even css like animations..
 
-		examplelab.getStyle().addTransitionState(StyleParam.color,0.0f,Color.RED);
-		examplelab.getStyle().addTransitionState(StyleParam.color,0.2f,Color.ORANGE);
-		examplelab.getStyle().addTransitionState(StyleParam.color,0.4f,Color.YELLOW);
-		examplelab.getStyle().addTransitionState(StyleParam.color,0.6f,Color.GREEN);
-		examplelab.getStyle().addTransitionState(StyleParam.color,0.8f,Color.BLUE);
-		examplelab.getStyle().addTransitionState(StyleParam.color,0.9f,Color.PURPLE);
-		//set transition time
-		examplelab.getStyle().setTransitionLength(5000.0f); 
+		// if you want to make a glitchy glow:
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.0f, 0.1f); // You have to start the animation at 0.0f
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.49f, 0.1f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.5f, 4f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.51f, 0.1f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.60f, 4f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.61f, 0.1f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.62f, 4f);
+		computerscreentext.getStyle().addTransitionState(StyleParam.glowSize, 0.63f, 0.1f); // You won't need to finish the animation all the way, it fills in the rest automatically. Then it loops back unless overridden.
+	
+		//set transition time	
+		computerscreentext.getStyle().setTransitionLength(10000.0f);
+![demoscreen4](https://user-images.githubusercontent.com/10658173/29994864-aee756f6-8fda-11e7-9c7c-2eb1e5c01760.gif)		
+
     
 - Build complex layouts using various panels;
 
