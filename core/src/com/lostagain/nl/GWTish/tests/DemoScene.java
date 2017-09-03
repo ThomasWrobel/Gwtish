@@ -137,8 +137,8 @@ public class DemoScene {
 			@Override
 			public void onClick() {
 				// move cam
-				activecam.position.set(-40f, 140f, -75f); //focus on newspaper
-				activecam.lookAt(12, 30, -65);
+				activecam.position.set(-40f, 140f, -75f); 
+				activecam.lookAt(12, 30, -65);//focus on newspaper
 			}
 		});
 
@@ -147,11 +147,30 @@ public class DemoScene {
 			@Override
 			public void onClick() {
 				// move cam
-				activecam.position.set(-25f, 120f, -95f); //focus on calender
-				activecam.lookAt(5f, 97, -95);
+				activecam.position.set(-25f, 120f, -95f); 
+				activecam.lookAt(5f, 97, -95);//focus on calender
 			}
 		});
-
+		//whiteboardtext click
+		whiteboardframe.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick() {
+				// move cam
+				activecam.position.set(30f,125, -45f); 
+				activecam.lookAt(170, 200, -10);//focus on whiteboardtext
+			}
+		});
+		
+		//computerscreenframe click
+		computerscreenframe.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick() {
+				// move cam
+				activecam.position.set(-35f, 110, -95f); 
+				activecam.lookAt(-15, 105, -154);//focus on computerscreenframe
+			}
+		});
+		
 	}
 
 
