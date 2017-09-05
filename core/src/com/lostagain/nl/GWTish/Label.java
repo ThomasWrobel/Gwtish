@@ -49,7 +49,7 @@ import com.lostagain.nl.GWTish.shader.GwtishWidgetShaderAttribute.TextScalingMod
  ***/
 public class Label extends LabelBase {
 
-	final static String logstag = "ME.Label";
+	final static String logstag = "GWTish.Label";
 	public static Logger Log = Logger.getLogger(logstag); //not we are using this rather then gdxs to allow level control per tag
 
 	/**
@@ -727,17 +727,22 @@ public class Label extends LabelBase {
 				addToThis.dispose();
 
 			} else {
+				Log.info("_________reuse old map!:"+newRequiredWidth+","+newRequiredHeight+" ");
+
 				//reuse old map!
 				textPixmap=addToThis;
 			}
 
 
 		} else {
+			Log.info("________New pixmap with no data:"+currentWidth+","+currentHeight+" ");
+
 			//new pixmap with no data
 			textPixmap = new Pixmap(currentWidth, currentHeight, Format.RGBA8888);
 
 		}
 
+		Log.info("_______ ");
 
 
 		Pixmap fontPixmap = getFontPixmap(standdardFont);
@@ -749,7 +754,9 @@ public class Label extends LabelBase {
 		
 		int current_index = 0; //used only to keep track of newlines
 		ArrayList<Integer> newline_indexs = new ArrayList<Integer>();
-		
+
+		Log.info("_______ "+startFromX+" "+startFromY);//0,0
+		Log.info("_______runs "+layout.runs.size);// Firefox crashs after this point
 		//now loop over each run of letters. 
 		for (GlyphRun grun : layout.runs) {
 
@@ -775,20 +782,38 @@ public class Label extends LabelBase {
 				currentTargetX = startFromX+ (int)grun.x  + (int)currentRunX;		//used to use startfrom to add to the pixmap, now we add to the texture instead		
 				currentTargetY = startFromY+ (int)grun.y;
 
+			 	int destX = currentTargetX + glyph.xoffset;
+				int destY = currentTargetY + glyph.yoffset;
+//				
+//				if (destX<0){
+//					destX=0;
+//				}
+//
+//				if (destY<0){
+//					destY=0;
+//				}
+				Log.info("___g:"+glyph.toString());//$ in chrome, space in FF
+
+				Log.info("___textPixmap:"+textPixmap.getWidth()+","+textPixmap.getHeight()+", "+
+				"___fontPixmap:"+fontPixmap.getWidth()+","+fontPixmap.getHeight()+", "+
+				        +glyph.srcX+", "+glyph.srcY+", "+glyph.width+", "+glyph.height+", "+
+						destX+", "+
+						destY+", "+						
+						glyph.width+", "+glyph.height);	//is minus 7 offsetx ok?
 				textPixmap.drawPixmap(
 						fontPixmap,
 						glyph.srcX,
 						glyph.srcY, 
 						glyph.width, 
 						glyph.height,
-						currentTargetX + glyph.xoffset,
-						currentTargetY + glyph.yoffset,						
+						destX,
+						destY,						
 						glyph.width, 
 						glyph.height);
 
-				// 	Log.info("___ "+glyph.toString()+" glyph.xadvance:"+glyph.xadvance+" w:"+glyph.width);	
 				//	Log.info("___g:"+g.toString());
 
+				Log.info("___g:"+glyph.toString());
 				runstring=runstring+glyph.toString();
 
 			}
@@ -852,6 +877,8 @@ public class Label extends LabelBase {
 
 		//textPixmap.dispose();
 
+
+		Log.info("_______generateTexture_fromLayout done");
 		return textureAndCursorObject;
 
 
@@ -1534,6 +1561,9 @@ public class Label extends LabelBase {
 		return this.getMaterial(LABEL_MATERIAL);
 	}
 
+	public Material getMaterial(){
+		return this.getMaterial(LABEL_MATERIAL);
+	}
 
 	@Override
 	public void setOpacity(float opacity){

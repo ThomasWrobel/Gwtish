@@ -258,8 +258,12 @@ public class DemoScene {
 		HorizontalPanel dateandprice = new HorizontalPanel();
 
 
+		Gwtish.Log.info("getNewsPaper.. ");
 		Label price = new Label("$1.49");
-		Label spacer = new Label(" ~~ ");		
+
+
+		Gwtish.Log.info("getNewsPaper..... ");
+		Label spacer = new Label(" ~~ ");	//ff seems to crash on space	
 		Label date = new Label("16th Oct");
 
 		final Label headline = new Label("Person looks at headline",35);

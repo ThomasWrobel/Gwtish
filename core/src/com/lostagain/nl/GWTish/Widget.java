@@ -136,7 +136,9 @@ public class Widget extends Element {
 		return DefaultWhiteBackground.copy();
 	}
 
-
+	public Material getMaterial(){
+		return this.getMaterial(SHADERFORBACKGROUND);
+	}
 	/**
 	 * Sets the opacity of the background (which will include text as well if this is a Label)
 	 * @param opacity
