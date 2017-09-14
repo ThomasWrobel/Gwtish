@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 
 /**
  * Crudely emulates some aspects of gwts htmlpanel widget
- * 
+ *
  * A htmlpanel is a panel that contains text, and which can attach child widgets to identified elements within that text.
  * As we have no real browser engine, dont expect real html support.<br>
  * However, positioning elements by ID will be done the same.<br>
@@ -31,7 +31,7 @@ import com.badlogic.gdx.graphics.Color;
 
  * @author darkflame
  *
- */		
+ */
 //TODO: resizing this panel wont work correctly yet. Widgets will reflow, but labels wont re-wrap, and certainly not recombine when once they were split (which would be ideal)
 //In future we need to at least ensure all labels have correct width set. Even with this though, newlines might be set needlessly early
 //TODO: remove pointless namedpoint copying &or text-parseing from some places
@@ -39,10 +39,10 @@ import com.badlogic.gdx.graphics.Color;
 //TODO: we might need a option to split all labels by their newlines if this widget might resize
 //this should only be ondemand though, else there might be a lot of wasted objects
 public class InsertsPanel extends FlowPanel {
-	public static Logger Log = Logger.getLogger("Gwtish.InsertsPanel"); 
+	public static Logger Log = Logger.getLogger("Gwtish.InsertsPanel");
 	Label currentActiveLabel;
 	private boolean splitnextnl=false;
-	
+
 	//[[oldlab][randomobject][oldlab][currentlabel...]]
 
 	boolean debugMode = true;
@@ -80,7 +80,7 @@ public class InsertsPanel extends FlowPanel {
 		super.add(currentActiveLabel);
 	}
 
-	
+
 	public InsertsPanel(String contents) {
 		super();
 		currentActiveLabel=setupLabel(contents,null);
@@ -103,17 +103,17 @@ public class InsertsPanel extends FlowPanel {
 
 
 	protected Label getDefaultLabelType(String contents){
-		
+
 		//make default label
 		Label label = new Label(contents);
-		
+
 		//now set style stuff
 		label.setInterpretBRasNewLine(interpretBRasNewLine); //as this sort of emulates html
 		label.setInterpretBackslashNasNewLine(interpretBackslashNasNewLine);
-		
+
 		label.setMaxWidth(super.maxWidth); //ensures never wider then this container. However, inserts may still make textlabels go outside the boundary right now
 
-		
+
 		//copy the text styles from the parent flowpanel? (ie, ourselves)
 		label.getStyle().setStyleToMatch(getStyle(),false,true);
 		//but we dont want any padding, background or border stuff
@@ -123,8 +123,8 @@ public class InsertsPanel extends FlowPanel {
 		label.getStyle().setPadding(0);
 		//
 		Log.info("created label:"+label.getText()+" padding:"+label.getStyle().getPadding());
-		
-		
+
+
 		//label.getStyle().setColor(Color.RED);
 		//(except for debugging)
 		if (debugMode){
@@ -132,14 +132,14 @@ public class InsertsPanel extends FlowPanel {
 		}
 		return label;
 	}
-	
-	
+
+
 	/**
 	 * all the known labels insert points
 	 */
-	HashMap<Label,NamedPointSet> allKnowenInsertPoints = new HashMap<Label,NamedPointSet>(); 
-	
-	
+	HashMap<Label,NamedPointSet> allKnowenInsertPoints = new HashMap<Label,NamedPointSet>();
+
+
 	/**
 	 * @author darkflame
 	 *
@@ -147,52 +147,52 @@ public class InsertsPanel extends FlowPanel {
 	static class NamedPointSet extends HashSet<NamedPoint> {
 
 		public int getPointForID(String iDstring) {
-			
+
 			for (NamedPoint point : this) {
 				if (point.ID.equalsIgnoreCase(iDstring)){
 					return point.index;
 				}
 			}
-			
+
 			return -1;
 		}
 
 		public NamedPointSet getPointsBefore(int insertstart) {
-			
+
 			NamedPointSet newset = new NamedPointSet();
-			
+
 			for (NamedPoint point : this) {
-				
+
 				if (point.index<=insertstart){
 					newset.add(new NamedPoint(point.index, point.ID));
 					}
-				
+
 			}
-			
+
 			return newset;
-		}		
-		
+		}
+
 		/**
 		 * subtracts start from points loc
 		 * @param insertstart
 		 * @return
 		 */
 		public NamedPointSet getPointsAfter(int insertstart) {
-			
+
 			NamedPointSet newset = new NamedPointSet();
-			
+
 			for (NamedPoint point : this) {
-				
+
 				if (point.index>insertstart){
 					newset.add(new NamedPoint(point.index - insertstart, point.ID));
-					
-					
+
+
 				}
-				
+
 			}
-			
+
 			return newset;
-		}	
+		}
 	}
 
 	/**
@@ -207,76 +207,76 @@ public class InsertsPanel extends FlowPanel {
 			super();
 			this.index = index;
 			ID = iD;
-		}		
+		}
 	}
-	
-	
+
+
 	 Label setupLabel(String contents,Label existing) {
 		 return this.setupLabel(contents, existing, false);
 	 }
-	 
+
 	//private
 	 Label setupLabel(String contents,Label existing,boolean addToExisting) {
-		 
+
 		 //normalize newlines to \n
 		 if (interpretBackslashNasNewLine){
 		 contents=Label.standardiseNewlinesStatic(contents);
 		 }
-		 
+
 		//
 		//first we pre-process to remember any insert points
 		//	detect insert points by  <div style=\"display:inline-block\" ID=\"Item_\"></div> or <div ID=\"Item_\"></div>
 		//we also should strip of that and any other html.
 		//We do this all now rather then later, as once labels are wrapped or split detecting the div tags will be much harder
 		//
-		 
+
 		int fromIndex=0;
 		int nextdivstart = contents.toLowerCase().indexOf("<div", fromIndex);
-		NamedPointSet inserts = new NamedPointSet(); 
-		
+		NamedPointSet inserts = new NamedPointSet();
+
 		if (nextdivstart!=-1){
 		do {
 			int nextdivend = contents.toLowerCase().indexOf("</div>", nextdivstart+4) + "</div>".length();
-			
+
 			String before_contents = contents.substring(0,nextdivstart);
 			String div_element = contents.substring(nextdivstart, nextdivend);
-			
+
 			Log.info("div_element:"+div_element);
-			
+
 			String insertPointID = getInsertID(div_element);
 			if (insertPointID!=null){
 
 				Log.info("insertPointID:"+insertPointID);
 				Log.info("insertPointIndex:"+nextdivstart);
-				
+
 				//make named point
 				NamedPoint insertpoint = new NamedPoint(nextdivstart,insertPointID);
 				inserts.add(insertpoint);
-				
+
 			}
-					
+
 		//	Log.info("nextdivend:"+nextdivend);
 			//Log.info("contents:"+contents.length());
-			
+
 			String after_contents = contents.substring(nextdivend); //+"</div>".length()
-			
+
 			contents = before_contents+after_contents; //strips div bit out
-			
-			fromIndex = nextdivstart; //because till divend was stripped, the previous startdiv is where we start looking for the next 
-			
+
+			fromIndex = nextdivstart; //because till divend was stripped, the previous startdiv is where we start looking for the next
+
 			nextdivstart = contents.toLowerCase().indexOf("<div", fromIndex); //get next one and loop
 		} while (nextdivstart!=-1); //(if there wasa next div)
 		}
-		
-		Log.info("stripped text:"+contents);
-		
-				
 
-		
+		Log.info("stripped text:"+contents);
+
+
+
+
 		 if (existing==null){
 			 //if none supplied use default label type
 			 existing = getDefaultLabelType(contents);
-		
+
 		 } else {
 			 //else set what was given
 			 if (addToExisting){
@@ -284,19 +284,19 @@ public class InsertsPanel extends FlowPanel {
 			 } else {
 				 existing.setText(contents);
 			 }
-			
+
 		 }
-		 
-		 
+
+
 			//now store the insert points as named points (if there was any)
 		 if (inserts.size()>0){
 			allKnowenInsertPoints.put(existing, inserts);
 		 }
 		existing.setInheritedVisibility(true);
-		
+
 		return existing;
 	}
-	 
+
 
 	 @Override
 	public void dispose() {
@@ -310,36 +310,36 @@ public class InsertsPanel extends FlowPanel {
 
 	static String insrt_prefix1 = "<div style=\"display:inline-block\" id=\"";
 	 static String insrt_prefix2 = "<div id=\"";
-	 
+
 	 private String getInsertID(String div_element) {
 		  div_element = div_element.toLowerCase();
 		 //currently	detect insert points by  <div style=\"display:inline-block\" ID=\"Item_\"></div>
-		 //or 
+		 //or
 		 //<div ID=\"Item_\"></div>
 		 // <div id="partlineinsert"></div>
-		  
-			
+
+
 		 if (div_element.startsWith(insrt_prefix1)){
-				 
+
 			 //ID is straight after prefix, before quote end
 			 int prefix_length = insrt_prefix1.length();
-			 int  quote_end = div_element.indexOf("\"",prefix_length);			 
+			 int  quote_end = div_element.indexOf("\"",prefix_length);
 			 String ID = div_element.substring(prefix_length, quote_end);
 			return ID;
 		 }
-		 
-		
+
+
 	 	if (div_element.startsWith(insrt_prefix2)){
-	 		
-	 		 int  quote_end = div_element.indexOf("\"",insrt_prefix2.length());				
+
+	 		 int  quote_end = div_element.indexOf("\"",insrt_prefix2.length());
 			 //ID is straight after prefix, before quote end
 	 		 int prefix_length = insrt_prefix2.length();
 	 		 String ID = div_element.substring(prefix_length, quote_end);
 	 		return ID;
-			 
+
 		}
-	 
-	 
+
+
 		return null;
 	}
 
@@ -350,11 +350,11 @@ public class InsertsPanel extends FlowPanel {
 	////needs to support auto-wrap newlines
 	public void addInnerText(String addThisText){
 
-		boolean countbr = currentActiveLabel.isInterpretBRasNewLine();		
+		boolean countbr = currentActiveLabel.isInterpretBRasNewLine();
 		boolean hasNewlines = Label.containsNewlines(addThisText,countbr);
-				
+
 		//if we dont have to split, or theres no newlines we can just add the text
-		if (!splitnextnl || !hasNewlines){			
+		if (!splitnextnl || !hasNewlines){
 			Log.info("adding text to existing");
 			//currentActiveLabel.addText(addThisText);
 			this.setupLabel(addThisText, currentActiveLabel, true);
@@ -378,40 +378,40 @@ public class InsertsPanel extends FlowPanel {
 			}
 		}
 		//------------------------------
-		
+
 
 		String before = addThisText.substring(0, next_nl);
 		String after = addThisText.substring(next_nl+newlinetype.length());
 
 		if (!before.isEmpty()){ 						//we dont make empty labels
-			Label beforelab = setupLabel(before,null);			
+			Label beforelab = setupLabel(before,null);
 			prepareWidgetToInsertsZIndex(beforelab); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
 			contents.add(beforelab); //inserts it before
 		};
-		
-		NewLinePlacer newline = new NewLinePlacer(debugMode); 
-		prepareWidgetToInsertsZIndex(newline); 
+
+		NewLinePlacer newline = new NewLinePlacer(debugMode);
+		prepareWidgetToInsertsZIndex(newline);
 		contents.add(newline);
-		
+
 		if (!after.isEmpty()){ 						//we dont make empty labels
-			Label afterlab = setupLabel(after,null);			
+			Label afterlab = setupLabel(after,null);
 			prepareWidgetToInsertsZIndex(afterlab); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
 			contents.add(afterlab); //inserts it before
-			
+
 		};
 
 		//setup the current active label to point to new end label
 		ensureCurrentActiveLabelSet();
-		
+
 		//now we recalculate and re-draw to put contents in correct order
 		//(normally done in super.insert or super.add automatically, but as we are manually changing the contents we need to do it ourselves)
-		recalculateLargestWidgets(); 		
-		repositionWidgets(); 
+		recalculateLargestWidgets();
+		repositionWidgets();
 		sizeToFitContents();
 		//
 		splitnextnl=false;
-		
-		
+
+
 	}
 
 	public void setInnerText(String setThisText){
@@ -422,43 +422,43 @@ public class InsertsPanel extends FlowPanel {
 	//	currentActiveLabel.setText(addThisText);
 
 	}
-	
-	
+
+
 	public String getAllKnowenInsertPoints(){
 		String debuglog ="";
 		for (Entry<Label, NamedPointSet> set : allKnowenInsertPoints.entrySet()) {
-			
+
 			debuglog=debuglog+"\n"+set.getKey().contents+"\n";
-			
+
 			for (NamedPoint namedPoint : set.getValue()) {
-				debuglog=debuglog+namedPoint.ID+":"+namedPoint.index+"\n";				
-			} 
-			
+				debuglog=debuglog+namedPoint.ID+":"+namedPoint.index+"\n";
+			}
+
 		}
-		
+
 		return debuglog;
 	}
 
 	/**
 	 * Inserts a widget at a location specified by a (fake) div
-	 * 
+	 *
 	 * @param newwidget
 	 * @param element_id  - will look for   {@literal <div id="(element_id)"></div>} to insert newwidget at <br>
 	 */
 	//Note: This method manipulates the "contents" array directly, then tells the widget to refresh
-	//While easier, using super.Insert(..) directly to change the widgets will needlessly fire 
-	//recalculateLargestWidgets,repositionWidgets and sizeToFitContents each time - when they only need to fire once after all the 
-	//contents array manipulation is done		
+	//While easier, using super.Insert(..) directly to change the widgets will needlessly fire
+	//recalculateLargestWidgets,repositionWidgets and sizeToFitContents each time - when they only need to fire once after all the
+	//contents array manipulation is done
 	public void add(Widget newwidget,String element_id){
 		Log.info("\n \n inserting at="+element_id);
-		
-		
+
+
 		//allKnowenInsertPoints
 
 		String IDstring = "<div id=\""+element_id+"\"></div>"; //id to look in string for. The Label will be split either side of this into two new labels with newwidget inbetween
 		IDstring="";
-		
-		ArrayList<Widget> arraycopy= new ArrayList<>(super.contents);
+
+		ArrayList<Widget> arraycopy= new ArrayList<Widget>(super.contents);
 
 		for (Widget widget : arraycopy) {
 
@@ -468,17 +468,17 @@ public class InsertsPanel extends FlowPanel {
 				String labtext=lab.getText();
 
 				Log.info("testing label:"+labtext);
-				
+
 				NamedPointSet namedpoints = allKnowenInsertPoints.get(lab);
 				if (namedpoints==null){ //no points
 					Log.info("(no insertpoints)");
 					continue;
 				}
-				
+
 				int insertstart=namedpoints.getPointForID(element_id);
 				Log.info("insertstart="+insertstart);
-				
-				
+
+
 				//int insertstart = labtext.indexOf(IDstring);
 
 				if (insertstart>-1){
@@ -486,8 +486,8 @@ public class InsertsPanel extends FlowPanel {
 					Log.info("testing label: match found within:"+labtext);
 					String before = labtext.substring(0, insertstart);
 					String after = labtext.substring(insertstart+IDstring.length());
-					
-					
+
+
 					Log.info(before+"[widget]"+after);
 
 
@@ -497,7 +497,7 @@ public class InsertsPanel extends FlowPanel {
 					Label afterlab = null;
 
 					if (!after.isEmpty()){ 						//we dont make empty labels
-						afterlab = setupLabel(after,null);			
+						afterlab = setupLabel(after,null);
 						prepareWidgetToInsertsZIndex(afterlab); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
 						contents.add(index,afterlab); //inserts it before
 					}
@@ -505,11 +505,11 @@ public class InsertsPanel extends FlowPanel {
 					prepareWidgetToInsertsZIndex(newwidget); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
 					newwidget.setInheritedVisibility(true);
 					contents.add(index,newwidget); //inserts it before
-					
+
 					Label beforelab = null;
 					if (!before.isEmpty()){						//we dont make empty labels
 
-						beforelab = setupLabel(before,null);	
+						beforelab = setupLabel(before,null);
 						prepareWidgetToInsertsZIndex(beforelab); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
 						contents.add(index,beforelab); //inserts it before
 						splitbylastnewline(beforelab);	//see below
@@ -518,14 +518,14 @@ public class InsertsPanel extends FlowPanel {
 					//need to get beforer/after insertpoints too, to copy into new labels
 					//
 					splitInsertPointsBetween(lab, insertstart, insertstart,afterlab, beforelab);
-					
-					
+
+
 					//now we remove the old label we split
 					allKnowenInsertPoints.remove(lab);
 					contents.remove(lab);
-					contentAlignments.remove(lab);		
-					lab.hide(false); //dont change its internal vis setting		
-					lab.setParent(null);		
+					contentAlignments.remove(lab);
+					lab.hide(false); //dont change its internal vis setting
+					lab.setParent(null);
 					this.removeAttachment(lab);
 					lab.dispose();
 					///----------------------
@@ -573,8 +573,8 @@ public class InsertsPanel extends FlowPanel {
 
 		//now we recalculate and re-draw to put contents in correct order
 		//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
-		recalculateLargestWidgets(); 		
-		repositionWidgets(); 
+		recalculateLargestWidgets();
+		repositionWidgets();
 		sizeToFitContents();
 		//
 
@@ -590,10 +590,10 @@ public class InsertsPanel extends FlowPanel {
 		if (sourcepoints!=null){
 			NamedPointSet beforepoints = sourcepoints.getPointsBefore(splitpoints);
 			NamedPointSet afterpoints = sourcepoints.getPointsAfter(splitpointe);
-			if (afterlab!=null){	
+			if (afterlab!=null){
 				allKnowenInsertPoints.put(afterlab, afterpoints);
 			}
-			if (beforelab!=null){	
+			if (beforelab!=null){
 				allKnowenInsertPoints.put(beforelab, beforepoints);
 			}
 		}
@@ -610,11 +610,11 @@ public class InsertsPanel extends FlowPanel {
 		Widget lastwidget = contents.get(contents.size()-1);
 
 		//currentActiveLabel should always be the last label, ensuring there is one first
-		if (lastwidget instanceof Label){			
+		if (lastwidget instanceof Label){
 			currentActiveLabel=(Label) lastwidget;
 		} else {
 			Label newcurrentlabel = this.setupLabel("",null);
-			prepareWidgetToInsertsZIndex(newcurrentlabel); 
+			prepareWidgetToInsertsZIndex(newcurrentlabel);
 			currentActiveLabel=newcurrentlabel;
 			contents.add(newcurrentlabel);
 		}
@@ -627,10 +627,10 @@ public class InsertsPanel extends FlowPanel {
 		String labtext=lab.getText().toLowerCase();
 
 		//boolean countbr = lab.isInterpretBRasNewLine();
-		
+
 		//return if no newlines
 //		boolean hasNewlines = lab.containsNewlines();
-//		
+//
 //		if (!hasNewlines){
 //			Log.info("no nextnl or br ");
 //			return;
@@ -649,28 +649,28 @@ public class InsertsPanel extends FlowPanel {
 			}
 		}
 */
-		
+
 		int lastnl =lab.getLastNewLineLocation();
-		
+
 		if (lastnl==-1){
 			Log.info("no newlines");
 			return;
 		}
-		
+
 		//the returned lastnl point might follow a <br> or nl that caused it (if it wasnt auto wrapped)
 		//these should be removed, so we have a extra number of chars we count back based on the length of what caused the newline
 		int extracountback=0;
 		if (lab.isInterpretBRasNewLine() && labtext.substring(0,lastnl).endsWith("<br>")){
-			extracountback="<br>".length();	
+			extracountback="<br>".length();
 		} else	if (lab.isInterpretBackslashNasNewLine() && labtext.substring(0,lastnl).endsWith("\n")){
-			extracountback="\n".length();	
+			extracountback="\n".length();
 		}
-		
-		
+
+
 		Log.info("lastnl:"+lastnl);
 		Log.info("prev chars:"+labtext.substring(0,lastnl-extracountback));
 		Log.info("next chars:"+labtext.substring(lastnl));
-		
+
 		int newlineendloc = lastnl;//+newlinetype.length();
 
 		insertNewLinebetween(lab, lastnl-extracountback, newlineendloc);
@@ -689,7 +689,7 @@ public class InsertsPanel extends FlowPanel {
 		String labtext=lab.getText().toLowerCase();
 
 /*
-		
+
 		Log.info("splitbynextnewline:\n"+labtext);
 		boolean countbr = lab.isInterpretBRasNewLine();
 
@@ -702,9 +702,9 @@ public class InsertsPanel extends FlowPanel {
 			{
 				Log.info("no nextnl or br ");
 				return ;
-			}			
+			}
 		} else {
-			//if it contains no nlss 
+			//if it contains no nlss
 			if (!labtext.contains("\n") )
 			{
 				Log.info("no nextnl ");
@@ -731,32 +731,32 @@ public class InsertsPanel extends FlowPanel {
 			Log.info("no newlines");
 			return;
 		}
-		
+
 		//the returned nextnl point might be followed by a <br> or nl that caused it (if it wasnt auto wrapped)
 		//these should be removed, so we have a extra number of chars we count forward based on the length of what caused the newline
 		int extracountforward=0;
 		if (lab.isInterpretBRasNewLine() && labtext.substring(next_nl).startsWith("<br>")){
-			extracountforward="<br>".length();	
+			extracountforward="<br>".length();
 		} else if (lab.isInterpretBackslashNasNewLine() && labtext.substring(next_nl).startsWith("\n")){
-			extracountforward="\n".length();	
+			extracountforward="\n".length();
 		}
-		
+
 		Log.info("next_nl:"+next_nl+" cf:"+extracountforward+"  "+lab.isInterpretBackslashNasNewLine());
 		Log.info("prev chars:"+labtext.substring(0,next_nl));
 		String substring = labtext.substring(next_nl+extracountforward);
 		Log.info("next chars:"+substring);
 //		if (substring.startsWith("\n")){
-//			Log.info("______________true");					
+//			Log.info("______________true");
 //		}
 //		if (substring.startsWith("\r\n")){
-//			Log.info("______kl;________true");					
+//			Log.info("______kl;________true");
 //		}
 //		if (substring.contains("\n")){
-//			Log.info("______nl at:"+substring.indexOf("\n"));		
-//			Log.info("______nl at:"+substring.substring(0, 2));	
+//			Log.info("______nl at:"+substring.indexOf("\n"));
+//			Log.info("______nl at:"+substring.substring(0, 2));
 //			Log.info("______nl at:"+substring.charAt(0));
-//			
-//				
+//
+//
 //		}
 		int newlineendloc = next_nl;//+newlinetype.length();
 
@@ -774,7 +774,7 @@ public class InsertsPanel extends FlowPanel {
 
 
 	private void insertNewLinebetween_oldunoptimised(Label lab, int newlinestartloc, int newlineendloc) {
-		String lab_text=lab.getText();		
+		String lab_text=lab.getText();
 		String before = lab_text.substring(0, newlinestartloc);
 		String after = lab_text.substring(newlineendloc);
 
@@ -787,13 +787,13 @@ public class InsertsPanel extends FlowPanel {
 
 
 		if (!after.isEmpty()){ 						//we dont make empty labels
-			Label afterlab = setupLabel(after,null);						
+			Label afterlab = setupLabel(after,null);
 			super.insert(afterlab, index); //inserts it before
 		}
-		super.insert(testnewline, index); //inserts it before	
+		super.insert(testnewline, index); //inserts it before
 
 		if (!before.isEmpty()){						//we dont make empty labels
-			Label beforelab = setupLabel(before,null);	
+			Label beforelab = setupLabel(before,null);
 			super.insert(beforelab, index); //inserts it before
 		}
 
@@ -803,20 +803,20 @@ public class InsertsPanel extends FlowPanel {
 
 	/**
 	 * Inserts a newline object between two locations in a label, splitting the label into two new labels either side
-	 * Text Contents between newlinestartloc and newlineendloc is removed 
+	 * Text Contents between newlinestartloc and newlineendloc is removed
 	 * (the idea being you remove the {@literal "<br>"} or "\n" from the string at the same time)
-	 * 
+	 *
 	 * @param lab
 	 * @param newlinestartloc
 	 * @param newlineendloc
 	 */
 	//Note: This method manipulates the "contents" array directly, then tells the widget to refresh
-	//While easier, using super.Insert(..) directly to change the widgets will needlessly fire 
-	//recalculateLargestWidgets,repositionWidgets and sizeToFitContents each time - when they only need to fire once after all the 
+	//While easier, using super.Insert(..) directly to change the widgets will needlessly fire
+	//recalculateLargestWidgets,repositionWidgets and sizeToFitContents each time - when they only need to fire once after all the
 	//contents array manipulation is done
 
 	private void insertNewLinebetween(Label lab, int newlinestartloc, int newlineendloc) {
-		String lab_text=lab.getText();		
+		String lab_text=lab.getText();
 		String before = lab_text.substring(0, newlinestartloc);
 		String after = lab_text.substring(newlineendloc);
 
@@ -835,7 +835,7 @@ public class InsertsPanel extends FlowPanel {
 		contents.add(index, testnewline);
 		Label beforelab = null ;
 		if (!before.isEmpty()){						//we dont make empty labels
-			 beforelab = setupLabel(before,null);	
+			 beforelab = setupLabel(before,null);
 			prepareWidgetToInsertsZIndex(beforelab); 	//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
 			contents.add(index, beforelab);
 		}
@@ -843,14 +843,14 @@ public class InsertsPanel extends FlowPanel {
 		//need to get beforer/after insertpoints too, to copy into new labels
 		//
 		splitInsertPointsBetween(lab, newlinestartloc,newlineendloc, afterlab, beforelab);
-		
-		
+
+
 		//now we remove the old label we split
 		allKnowenInsertPoints.remove(lab);
 		contents.remove(lab);
-		contentAlignments.remove(lab);		
-		lab.hide(false); //dont change its internal vis setting		
-		lab.setParent(null);		
+		contentAlignments.remove(lab);
+		lab.hide(false); //dont change its internal vis setting
+		lab.setParent(null);
 		this.removeAttachment(lab);
 		lab.dispose();
 		///----------------------
@@ -858,8 +858,8 @@ public class InsertsPanel extends FlowPanel {
 
 		//now we recalculate and re-draw to put contents in correct order
 		//(normally done in super.insert automatically, but as we are manually changing the contents we need to do it ourselves)
-		recalculateLargestWidgets(); 		
-		repositionWidgets(); 
+		recalculateLargestWidgets();
+		repositionWidgets();
 		sizeToFitContents();
 		//
 
@@ -879,7 +879,7 @@ public class InsertsPanel extends FlowPanel {
 
 		String IDstring = "<div id=\""+id+"\"></div>";
 
-		ArrayList<Widget> arraycopy= new ArrayList<>(super.contents);
+		ArrayList<Widget> arraycopy= new ArrayList<Widget>(super.contents);
 
 		for (Widget widget : arraycopy) {
 
@@ -905,16 +905,16 @@ public class InsertsPanel extends FlowPanel {
 					Log.info("[index]"+index);
 					Label afterlab = null;
 					if (!after.isEmpty()){ 						//we dont make empty labels
-						afterlab = setupLabel(after,null);						
+						afterlab = setupLabel(after,null);
 						super.insert(afterlab, index); //inserts it before
 					}
-					super.insert(newwidget, index); //inserts it before	
+					super.insert(newwidget, index); //inserts it before
 
 					if (!before.isEmpty()){						//we dont make empty labels
 
 
 
-						Label beforelab = setupLabel(before,null);	
+						Label beforelab = setupLabel(before,null);
 						super.insert(beforelab, index); //inserts it before
 
 						splitbylastnewline(beforelab);	//see below
@@ -963,7 +963,7 @@ public class InsertsPanel extends FlowPanel {
 		Widget lastwidget = contents.get(contents.size()-1);
 
 		//currentActiveLabel should always be the last label, ensuring there is one first
-		if (lastwidget instanceof Label){			
+		if (lastwidget instanceof Label){
 			currentActiveLabel=(Label) lastwidget;
 		} else {
 			Label newcurrentlabel = this.setupLabel("",null);
@@ -977,7 +977,7 @@ public class InsertsPanel extends FlowPanel {
 	}
 	public void setMaxWidth(int sizeInt) {
 		super.setWidth(sizeInt);
-		
+
 	}
 	public String getText() {
 		String totalText = "";
@@ -987,13 +987,13 @@ public class InsertsPanel extends FlowPanel {
 			if (widget instanceof Label){
 				totalText = totalText+((Label)widget).getText();
 			}
-			
+
 		}
 
-		
+
 		return totalText;
 	}
-	
+
 
 	/**
 	 * we can optionally interpret html like br tags as newlines
@@ -1001,10 +1001,10 @@ public class InsertsPanel extends FlowPanel {
 	private boolean interpretBRasNewLine=true;
 
 	private boolean interpretBackslashNasNewLine=true;
-	
+
 	public void setInterpretBRasNewLine(boolean interpretBRasNewLine) {
 		 this.interpretBRasNewLine=interpretBRasNewLine;
-		
+
 	}
 	public void setInterpretBackslashNasNewLine(boolean interpretNLasNewLine) {
 		 this.interpretBackslashNasNewLine=interpretNLasNewLine;

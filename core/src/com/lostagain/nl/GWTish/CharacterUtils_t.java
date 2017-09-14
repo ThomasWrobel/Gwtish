@@ -17,7 +17,7 @@ public class CharacterUtils_t {
      */
     public static final class UnicodeBlock extends Subset {
 
-        private static Map<String, UnicodeBlock> map = new HashMap<>(256);
+        private static Map<String, UnicodeBlock> map = new HashMap<String, UnicodeBlock>(256);
 
         /**
          * Creates a UnicodeBlock with the given identifier name.
@@ -2533,7 +2533,7 @@ public class CharacterUtils_t {
             int plane = codePoint >>> 16;
             return plane < ((MAX_CODE_POINT + 1) >>> 16);
         }
-        
+
         /**
          * Returns the UnicodeBlock with the given name. Block
          * names are determined by The Unicode Standard. The file
@@ -2600,7 +2600,7 @@ public class CharacterUtils_t {
             (codePoint >= 0x7F || (codePoint >>> 5 == 0));
     }
 
-    
+
 
 	public boolean isPrintableChar( char c ) {
 		CharacterUtils_t.UnicodeBlock block = CharacterUtils_t.UnicodeBlock.of( c );
